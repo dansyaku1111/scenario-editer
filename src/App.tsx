@@ -1,22 +1,20 @@
 import { useState } from 'react';
-import { NodeEditor, ClassicPreset } from 'rete';
+import { GetSchemes, NodeEditor, ClassicPreset } from 'rete';
 import NodeEditorComponent from './components/NodeEditor';
 import Toolbar from './components/Toolbar';
 import JsonViewer from './components/JsonViewer';
 import { StartNode, ActionNode, ConditionNode, EndNode, ImageNode } from './components/NodeTypes';
 import { exportData, importData } from './utils/jsonHandler';
-import EditorPanel from './components/EditorPanel'; // 新しくインポート
 
 // Define the schemes for the editor
 export type Schemes = GetSchemes<
-    (ClassicPreset.Node & { data: { [key: string]: any } }), // dataプロパティの型を許容
+    ClassicPreset.Node & { label: string },
     ClassicPreset.Connection<ClassicPreset.Node, ClassicPreset.Node>
 >;
 
 export default function App() {
     const [editor, setEditor] = useState<NodeEditor<Schemes> | null>(null);
     const [jsonData, setJsonData] = useState<string>('// JSONデータがここに表示されます');
-    const [selectedNode, setSelectedNode] = useState<Schemes['Node'] | null>(null); // 選択中ノードの状態
 
     const addNode = async (type: 'start' | 'action' | 'condition' | 'end' | 'image') => {
         if (!editor) return;
@@ -29,19 +27,6 @@ export default function App() {
             case 'image': node = new ImageNode(); break;
         }
         await editor.addNode(node);
-    };
-
-    // 選択中ノードのデータを更新する関数
-    const updateNodeData = (nodeId: string, newData: { [key: string]: any }) => {
-        if (!editor) return;
-        const node = editor.getNode(nodeId);
-        if (node) {
-            node.data = { ...node.data, ...newData };
-            // AreaPluginに更新を通知して、UIを再描画させる
-            editor.getPlugin('rete-area-plugin').update('node', nodeId);
-            // 選択中のノードのstateも更新
-            setSelectedNode({ ...node });
-        }
     };
 
     const handleExport = async () => {
@@ -68,12 +53,11 @@ export default function App() {
     const clearCanvas = async () => {
         if (!editor) return;
         await editor.clear();
-        setSelectedNode(null); // 選択状態もクリア
         setJsonData('// キャンバスがクリアされました');
     }
 
     return (
-        <div className="bg-gray-50 p-8 max-w-full min-h-screen">
+        <div className="bg-gray-50 p-8 max-w-7xl mx-auto">
             <h1 className="text-3xl font-bold mb-6 text-gray-800">Rete.js シナリオエディタ</h1>
             <Toolbar
                 onAddNode={addNode}
@@ -81,18 +65,8 @@ export default function App() {
                 onImport={handleImport}
                 onClear={clearCanvas}
             />
-            <div className="flex gap-4 mt-4">
-                {/* 左カラム: ノードエディタ */}
-                <div className="flex-grow bg-white rounded-lg shadow-lg p-4">
-                    <NodeEditorComponent setEditor={setEditor} onNodeSelected={setSelectedNode} />
-                </div>
-                {/* 右カラム: 編集パネル */}
-                <div className="w-96 flex-shrink-0">
-                    <EditorPanel 
-                        node={selectedNode} 
-                        onUpdate={updateNodeData} 
-                    />
-                </div>
+            <div className="mt-4 bg-white rounded-lg shadow-lg p-4">
+                <NodeEditorComponent setEditor={setEditor} />
             </div>
             <div className="mt-6">
                 <h2 className="text-xl font-bold mb-2 text-gray-800">JSON出力</h2>

@@ -5,6 +5,8 @@ type Props = {
     onImport: (file: File) => void;
     onExport: () => void;
     onClear: () => void;
+    isGridSnapEnabled: boolean;
+    onToggleGridSnap: () => void;
 };
 
 export default function Toolbar(props: Props) {
@@ -30,6 +32,22 @@ export default function Toolbar(props: Props) {
             <button onClick={() => props.onAddNode('end')} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">エンドノード追加</button>
             <button onClick={() => props.onAddNode('image')} className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600">画像ノード追加</button>
             <div className="flex-1"></div>
+
+            {/* --- ここからがチェックボックスの描画ロジックです --- */}
+            <div className="flex items-center gap-2 border-l pl-4">
+                <input
+                    type="checkbox"
+                    id="grid-snap-toggle" // デバッグスクリプトはこのidを探します
+                    checked={props.isGridSnapEnabled}
+                    onChange={props.onToggleGridSnap}
+                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                />
+                <label htmlFor="grid-snap-toggle" className="text-sm font-medium text-gray-700">
+                    グリッド/スナップ
+                </label>
+            </div>
+            {/* --- ここまで --- */}
+
             <button onClick={props.onExport} className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800">JSONエクスポート</button>
             <button onClick={handleImportClick} className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800">JSONインポート</button>
             <button onClick={props.onClear} className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">クリア</button>
