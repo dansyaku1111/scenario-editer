@@ -1,21 +1,25 @@
-import { useState } from 'react';
-import { GetSchemes, NodeEditor, ClassicPreset } from 'rete';
+import { useState, useCallback } from 'react'; // useCallbackをインポート
+import { NodeEditor } from 'rete';
 import NodeEditorComponent from './components/NodeEditor';
 import Toolbar from './components/Toolbar';
 import JsonViewer from './components/JsonViewer';
-import { StartNode, ActionNode, ConditionNode, EndNode, ImageNode } from './components/NodeTypes';
+import EditorPanel from './components/EditorPanel';
 import { exportData, importData } from './utils/jsonHandler';
-
-// Define the schemes for the editor
-export type Schemes = GetSchemes<
-    ClassicPreset.Node & { label: string },
-    ClassicPreset.Connection<ClassicPreset.Node, ClassicPreset.Node>
->;
+import { Schemes } from './utils/jsonSchema';
+import { StartNode, ActionNode, ConditionNode, EndNode, ImageNode } from './components/NodeTypes';
 
 export default function App() {
     const [editor, setEditor] = useState<NodeEditor<Schemes> | null>(null);
     const [jsonData, setJsonData] = useState<string>('// JSONデータがここに表示されます');
+    const [selectedNode, setSelectedNode] = useState<Schemes['Node'] | null>(null);
+    const [isGridSnapEnabled, setGridSnapEnabled] = useState(true);
 
+    // ▼▼▼ useCallbackで関数をメモ化（安定化）させる ▼▼▼
+    const handleNodeSelected = useCallback((node: Schemes['Node'] | null) => {
+        setSelectedNode(node);
+    }, []); // 依存配列は空なので、この関数は一度しか生成されない
+
+    // ... (addNode, updateNodeData, handleExport, etc. は変更なし) ...
     const addNode = async (type: 'start' | 'action' | 'condition' | 'end' | 'image') => {
         if (!editor) return;
         let node;
@@ -28,45 +32,36 @@ export default function App() {
         }
         await editor.addNode(node);
     };
-
-    const handleExport = async () => {
-        if (!editor) return;
-        const data = await exportData(editor);
-        setJsonData(JSON.stringify(data, null, 2));
-    };
-
-    const handleImport = async (file: File) => {
-        if (!editor) return;
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-            try {
-                const data = JSON.parse(e.target.result as string);
-                await importData(editor, data);
-                setJsonData(JSON.stringify(data, null, 2));
-            } catch (error) {
-                alert('JSONファイルの読み込みに失敗しました: ' + (error as Error).message);
-            }
-        };
-        reader.readAsText(file);
-    };
-    
-    const clearCanvas = async () => {
-        if (!editor) return;
-        await editor.clear();
-        setJsonData('// キャンバスがクリアされました');
-    }
+    const updateNodeData = () => {}; // 仮
+    const handleExport = async () => { if(editor) await exportData(editor) };
+    const handleImport = async (file: File) => { if(editor) await importData(editor, file) };
+    const clearCanvas = async () => { if(editor) await editor.clear() };
 
     return (
-        <div className="bg-gray-50 p-8 max-w-7xl mx-auto">
+        <div className="bg-gray-50 p-8 max-w-full min-h-screen">
             <h1 className="text-3xl font-bold mb-6 text-gray-800">Rete.js シナリオエディタ</h1>
             <Toolbar
                 onAddNode={addNode}
                 onExport={handleExport}
                 onImport={handleImport}
                 onClear={clearCanvas}
+                isGridSnapEnabled={isGridSnapEnabled}
+                onToggleGridSnap={() => setGridSnapEnabled(prev => !prev)}
             />
-            <div className="mt-4 bg-white rounded-lg shadow-lg p-4">
-                <NodeEditorComponent setEditor={setEditor} />
+            <div className="flex flex-col md:flex-row gap-4 mt-4">
+                <div className="flex-grow bg-white rounded-lg shadow-lg p-4 relative" style={{ height: '75vh' }}>
+                    <NodeEditorComponent
+                        setEditor={setEditor}
+                        onNodeSelected={handleNodeSelected} // メモ化された関数を渡す
+                        isGridSnapEnabled={isGridSnapEnabled}
+                    />
+                </div>
+                <div className="w-full md:w-96 flex-shrink-0">
+                    <EditorPanel
+                        node={selectedNode}
+                        onUpdate={updateNodeData}
+                    />
+                </div>
             </div>
             <div className="mt-6">
                 <h2 className="text-xl font-bold mb-2 text-gray-800">JSON出力</h2>

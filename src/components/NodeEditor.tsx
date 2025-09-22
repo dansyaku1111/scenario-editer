@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { NodeEditor } from 'rete';
 import { AreaPlugin, AreaExtensions } from 'rete-area-plugin';
 import { ConnectionPlugin, Presets as ConnectionPresets } from 'rete-connection-plugin';
@@ -13,29 +13,21 @@ type EditorProps = {
   isGridSnapEnabled: boolean;
 };
 
-// ▼▼▼ propsを常に最新に保つためのカスタムフック ▼▼▼
-function useLatest<T>(value: T) {
-  const ref = useRef(value);
-  useEffect(() => {
-    ref.current = value;
-  });
-  return ref;
-}
-
 export function useEditor(props: EditorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [editorInstance, setEditorInstance] = useState<NodeEditor<Schemes> | null>(null);
-  const [areaInstance, setAreaInstance] = useState<AreaPlugin<Schemes, any> | null>(null);
+  const editorRef = useRef<NodeEditor<Schemes>>();
+  const areaRef = useRef<AreaPlugin<Schemes, any>>();
 
-  // ▼▼▼ propsをrefとしてラップし、常に最新の値を参照できるようにする ▼▼▼
-  const latestProps = useLatest(props);
-
-  // === 1. 初回マウント時にエディタを一度だけセットアップするuseEffect ===
+  // === エディタのセットアップとイベントリスナー登録をまとめて管理するuseEffect ===
   useEffect(() => {
     if (!containerRef.current) return;
 
+    // --- 1. 初回のみ実行する処理 ---
     const editor = new NodeEditor<Schemes>();
     const area = new AreaPlugin<Schemes, any>(containerRef.current);
+    editorRef.current = editor;
+    areaRef.current = area;
+
     const connection = new ConnectionPlugin<Schemes, any>();
     const render = new ReactPlugin<Schemes>({ createRoot });
     
@@ -47,30 +39,22 @@ export function useEditor(props: EditorProps) {
     render.addPreset(ReactPresets.classic.setup());
     AreaExtensions.simpleNodesOrder(area);
 
+    props.setEditor(editor);
+
+    // --- 2. 毎回のレンダリングで設定が必要なイベントハンドラ ---
     const selector = AreaExtensions.selector();
     const accumulating = AreaExtensions.accumulateOnCtrl();
     AreaExtensions.selectableNodes(area, selector, { accumulating });
 
     const handleSelection = () => {
-        // ▼▼▼ 以下を検証のために追加 ▼▼▼
-        console.log("--- handleSelectionが実行されました ---");
-        console.log("onNodeSelectedRef オブジェクト:", onNodeSelectedRef);
-        console.log("onNodeSelectedRef.current の値:", onNodeSelectedRef.current);
-        console.log("typeof onNodeSelectedRef.current:", typeof onNodeSelectedRef.current);
-        
-        // エラーを一時的に防ぐため、関数であるかチェックしてから呼び出す
-        if (typeof onNodeSelectedRef.current === 'function') {
-            const selected = Array.from(selector.entities.values());
-            if (selected.length === 1 && 'label' in selected[0] && selected[0].label === 'node') {
-                onNodeSelectedRef.current(editor.getNode(selected[0].id));
-            } else {
-                onNodeSelectedRef.current(null);
-            }
+        const selected = Array.from(selector.entities.values());
+        if (selected.length === 1 && 'label' in selected[0] && selected[0].label === 'node') {
+            props.onNodeSelected(editor.getNode(selected[0].id));
         } else {
-            console.error("エラーの原因: onNodeSelectedRef.current は関数ではありません！");
+            props.onNodeSelected(null);
         }
     };
-    area.addPipe(context => {
+    const selectionDisposer = area.addPipe(context => {
         if (context.type === 'nodepicked' || context.type === 'pointerup' || context.type === 'nodedragged') {
             setTimeout(handleSelection, 0);
         }
@@ -90,38 +74,36 @@ export function useEditor(props: EditorProps) {
         }
     };
     document.addEventListener('keydown', handleKeyDown);
-
-    setEditorInstance(editor);
-    setAreaInstance(area);
-    latestProps.current.setEditor(editor);
-
+    
+    // --- 3. クリーンアップ関数 ---
     return () => {
         document.removeEventListener('keydown', handleKeyDown);
-        latestProps.current.setEditor(null);
-        area.destroy();
+        selectionDisposer(); // イベントリスナーを解除
+        // ここでarea.destroy()は呼ばない。コンポーネント自体が消える時に呼ぶ
     };
-  }, []); // 依存配列は空のまま
+  }, [props.onNodeSelected]); // onNodeSelectedが変更されたら再実行
 
-  // === 2. isGridSnapEnabled の変更を監視するuseEffect (変更なし) ===
+  // === グリッドとスナップ機能だけを管理するuseEffect ===
   useEffect(() => {
-    if (!areaInstance) return;
-
+    const area = areaRef.current;
+    if (!area) return;
+    
     const snapSize = 16;
     let gridRoot: Root | null = null;
     let gridContainer: HTMLDivElement | null = null;
     let disposer: (() => void) | null = null;
 
-    if (latestProps.current.isGridSnapEnabled) {
+    if (props.isGridSnapEnabled) {
         gridContainer = document.createElement('div');
         gridContainer.className = 'grid-background';
-        const backgroundHolder = areaInstance.area.content.holder;
+        const backgroundHolder = area.area.content.holder;
         backgroundHolder.insertBefore(gridContainer, backgroundHolder.firstChild);
         gridRoot = createRoot(gridContainer);
         gridRoot.render(<GridBackground size={snapSize} />);
-        disposer = areaInstance.addPipe(context => {
+        disposer = area.addPipe(context => {
             if (context.type === 'nodetranslated') {
-                const { id } = context.data;
-                const view = areaInstance.nodeViews.get(id);
+                const id = context.data.id;
+                const view = area.nodeViews.get(id);
                 if (view) {
                     const { x, y } = view.position;
                     const snappedX = Math.round(x / snapSize) * snapSize;
@@ -135,12 +117,22 @@ export function useEditor(props: EditorProps) {
 
     return () => {
         if (gridRoot) gridRoot.unmount();
-        if (gridContainer && areaInstance.area.content.holder.contains(gridContainer)) {
-            areaInstance.area.content.holder.removeChild(gridContainer);
+        if (gridContainer && area.area.content.holder.contains(gridContainer)) {
+            area.area.content.holder.removeChild(gridContainer);
         }
         if (disposer) disposer();
     };
-  }, [latestProps.current.isGridSnapEnabled, areaInstance]);
+  }, [props.isGridSnapEnabled]);
+  
+  // === コンポーネントが完全にアンマウントされる時の最終クリーンアップ ===
+  useEffect(() => {
+      return () => {
+          props.setEditor(null);
+          if (areaRef.current) {
+              areaRef.current.destroy();
+          }
+      }
+  }, []);
 
   return { ref: containerRef };
 }
