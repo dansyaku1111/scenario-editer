@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.rete-editor {
+    width: 100%;
+    height: 600px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    background: #f9fafb;
+}
+
+[data-testid='node'] {
+    background: white;
+    border: 2px solid #3b82f6;
+    border-radius: 8px;
+    padding: 12px;
+    min-width: 180px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    cursor: move;
+    user-select: none;
+}
+
+[data-testid='node'].selected {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
+.node-header {
+    font-weight: bold;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* Custom node styling based on type */
+.start-node {
+    background: #dcfce7;
+    border-color: #22c55e;
+}
+
+.action-node {
+    background: #dbeafe;
+    border-color: #3b82f6;
+}
+
+.condition-node {
+    background: #fef3c7;
+    border-color: #f59e0b;
+}
+
+.end-node {
+    background: #fee2e2;
+    border-color: #ef4444;
+}
+
+[data-testid='socket'] {
+    width: 14px;
+    height: 14px;
+    background: #94a3b8;
+    border: 2px solid white;
+    border-radius: 9999px;
+}
+
+[data-testid='socket']:hover {
+    background: #3b82f6;
+}
+
+[data-testid='connection'] {
+    stroke: #94a3b8;
+    stroke-width: 3;
+    fill: none;
+}
+
+.json-viewer {
+    font-family: 'Courier New', monospace;
+    background: #1f2937;
+    color: #f3f4f6;
+    padding: 16px;
+    border-radius: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.toolbar {
+    background: white;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
