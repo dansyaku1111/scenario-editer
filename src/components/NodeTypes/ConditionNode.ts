@@ -8,7 +8,7 @@ export class ConditionNode extends ClassicPreset.Node<
 > {
     width = 180;
     height = 120; // 高さを調整
-    data: { text: string } = { text: '' }; // dataプロパティを定義
+    data: { text: string; url?: string } = { text: '' }; // dataプロパティを定義
 
     constructor(initial?: string) {
         super('Condition');

@@ -8,7 +8,7 @@ export class ActionNode extends ClassicPreset.Node<
 > {
     width = 180;
     height = 100; // 高さを調整
-    data: { text: string } = { text: '' }; // dataプロパティを定義
+    data: { text: string; url?: string } = { text: '' }; // dataプロパティを定義
 
     constructor(initial?: string) {
         super('Action');
