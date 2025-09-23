@@ -32,7 +32,17 @@ export default function App() {
         }
         await editor.addNode(node);
     };
-    const updateNodeData = () => {}; // 仮
+    const updateNodeData = (nodeId: string, data: Partial<Schemes['Node']['data']>) => {
+        if (!editor) return;
+
+        const node = editor.getNode(nodeId);
+        if (node) {
+            // ノードのデータを更新
+            node.data = { ...node.data, ...data };
+            // EditorPanelを再描画するために、selectedNodeの状態を更新
+            setSelectedNode({ ...node });
+        }
+    };
     const handleExport = async () => { if(editor) await exportData(editor) };
     const handleImport = async (file: File) => { if(editor) await importData(editor, file) };
     const clearCanvas = async () => { if(editor) await editor.clear() };
