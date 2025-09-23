@@ -5,8 +5,6 @@ type Props = {
     onImport: (file: File) => void;
     onExport: () => void;
     onClear: () => void;
-    isGridSnapEnabled: boolean;
-    onToggleGridSnap: () => void;
 };
 
 export default function Toolbar(props: Props) {

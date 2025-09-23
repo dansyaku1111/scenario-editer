@@ -62,6 +62,12 @@ export function useEditor(props: EditorProps) {
     });
 
     const handleKeyDown = async (e: KeyboardEvent) => {
+        const target = e.target as HTMLElement;
+        // 入力フィールドにフォーカスがある場合は何もしない
+        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+            return;
+        }
+
         if (e.key === 'Delete') {
             const nodesToDelete = Array.from(selector.entities.values()).filter(e => 'label' in e && e.label === 'node').map(e => e.id);
             if (nodesToDelete.length === 0) return;
@@ -78,10 +84,12 @@ export function useEditor(props: EditorProps) {
     // --- 3. クリーンアップ関数 ---
     return () => {
         document.removeEventListener('keydown', handleKeyDown);
-        selectionDisposer(); // イベントリスナーを解除
+        if (typeof selectionDisposer === 'function') {
+            selectionDisposer(); // イベントリスナーを解除
+        }
         // ここでarea.destroy()は呼ばない。コンポーネント自体が消える時に呼ぶ
     };
-  }, [props.onNodeSelected]); // onNodeSelectedが変更されたら再実行
+  }, [props.setEditor]); // setEditorが変更されたら再実行
 
   // === グリッドとスナップ機能だけを管理するuseEffect ===
   useEffect(() => {
@@ -93,36 +101,43 @@ export function useEditor(props: EditorProps) {
     let gridContainer: HTMLDivElement | null = null;
     let disposer: (() => void) | null = null;
 
-    if (props.isGridSnapEnabled) {
-        gridContainer = document.createElement('div');
-        gridContainer.className = 'grid-background';
-        const backgroundHolder = area.area.content.holder;
-        backgroundHolder.insertBefore(gridContainer, backgroundHolder.firstChild);
-        gridRoot = createRoot(gridContainer);
-        gridRoot.render(<GridBackground size={snapSize} />);
-        disposer = area.addPipe(context => {
-            if (context.type === 'nodetranslated') {
-                const id = context.data.id;
-                const view = area.nodeViews.get(id);
-                if (view) {
-                    const { x, y } = view.position;
-                    const snappedX = Math.round(x / snapSize) * snapSize;
-                    const snappedY = Math.round(y / snapSize) * snapSize;
+    gridContainer = document.createElement('div');
+    gridContainer.className = 'grid-background';
+    const backgroundHolder = area.area.content.holder;
+    backgroundHolder.insertBefore(gridContainer, backgroundHolder.firstChild);
+    gridRoot = createRoot(gridContainer);
+    gridRoot.render(<GridBackground size={snapSize} />);
+    disposer = area.addPipe(context => {
+        if (context.type === 'nodetranslated') {
+            const id = context.data.id;
+            const view = area.nodeViews.get(id);
+            if (view) {
+                const { x, y } = view.position;
+                const snappedX = Math.round(x / snapSize) * snapSize;
+                const snappedY = Math.round(y / snapSize) * snapSize;
+                // 現在位置がスナップ後の位置と異なるときだけ translate を呼ぶ
+                if (x !== snappedX || y !== snappedY) {
                     view.translate(snappedX, snappedY);
                 }
             }
-            return context;
-        });
-    }
+        }
+        return context;
+    });
 
     return () => {
-        if (gridRoot) gridRoot.unmount();
-        if (gridContainer && area.area.content.holder.contains(gridContainer)) {
-            area.area.content.holder.removeChild(gridContainer);
-        }
         if (disposer) disposer();
+
+        // unmountとDOM操作を非同期にして、Reactのレンダリングサイクルとの競合を避ける
+        setTimeout(() => {
+            if (gridRoot) {
+                gridRoot.unmount();
+            }
+            if (gridContainer && area.area.content.holder.contains(gridContainer)) {
+                area.area.content.holder.removeChild(gridContainer);
+            }
+        }, 0);
     };
-  }, [props.isGridSnapEnabled]);
+  }, []);
   
   // === コンポーネントが完全にアンマウントされる時の最終クリーンアップ ===
   useEffect(() => {

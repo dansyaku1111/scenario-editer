@@ -53,7 +53,6 @@ export default function App() {
                     <NodeEditorComponent
                         setEditor={setEditor}
                         onNodeSelected={handleNodeSelected} // メモ化された関数を渡す
-                        isGridSnapEnabled={isGridSnapEnabled}
                     />
                 </div>
                 <div className="w-full md:w-96 flex-shrink-0">
