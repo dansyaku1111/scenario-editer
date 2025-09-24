@@ -12,7 +12,6 @@ export default function App() {
     const [editor, setEditor] = useState<NodeEditor<Schemes> | null>(null);
     const [jsonData, setJsonData] = useState<string>('// JSONデータがここに表示されます');
     const [selectedNode, setSelectedNode] = useState<Schemes['Node'] | null>(null);
-    const [isGridSnapEnabled, setGridSnapEnabled] = useState(true);
 
     // ▼▼▼ useCallbackで関数をメモ化（安定化）させる ▼▼▼
     const handleNodeSelected = useCallback((node: Schemes['Node'] | null) => {
@@ -55,8 +54,6 @@ export default function App() {
                 onExport={handleExport}
                 onImport={handleImport}
                 onClear={clearCanvas}
-                isGridSnapEnabled={isGridSnapEnabled}
-                onToggleGridSnap={() => setGridSnapEnabled(prev => !prev)}
             />
             <div className="flex flex-col md:flex-row gap-4 mt-4">
                 <div className="flex-grow bg-white rounded-lg shadow-lg p-4 relative" style={{ height: '75vh' }}>

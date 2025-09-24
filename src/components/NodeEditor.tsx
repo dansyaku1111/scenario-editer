@@ -10,7 +10,6 @@ import GridBackground from './GridBackground';
 type EditorProps = {
   setEditor: (editor: NodeEditor<Schemes> | null) => void;
   onNodeSelected: (node: Schemes['Node'] | null) => void;
-  isGridSnapEnabled: boolean;
 };
 
 export function useEditor(props: EditorProps) {
