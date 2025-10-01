@@ -19,9 +19,9 @@ export function ImageNodeComponent({ data }: Props) {
       </div>
 
       <div className="p-2 text-left">
-        {nodeData.imageUrl && (
+        {(nodeData.url || nodeData.imageUrl) && (
           <img
-            src={nodeData.imageUrl}
+            src={nodeData.url || nodeData.imageUrl}
             alt="Node content"
             className="w-full h-auto rounded-md mb-2"
             style={{ maxWidth: '220px', maxHeight: '150px', objectFit: 'contain' }}

@@ -1,4 +1,3 @@
-import { ClassicPreset } from 'rete';
 import { Schemes } from '../../utils/jsonSchema';
 
 type Props = {
@@ -6,7 +5,7 @@ type Props = {
 };
 
 export function ContentNodeComponent({ data }: Props) {
-  const { inputs, outputs, label, data: nodeData } = data;
+  const { label, data: nodeData } = data;
 
   return (
     <div
@@ -34,24 +33,6 @@ export function ContentNodeComponent({ data }: Props) {
           </p>
         )}
       </div>
-
-      {/* Input Sockets */}
-      {inputs?.exec && (
-        <div className="absolute -left-4 top-1/2 -translate-y-1/2" data-testid="input-socket">
-          <ClassicPreset.Socket
-            {...inputs.exec}
-          />
-        </div>
-      )}
-
-      {/* Output Sockets */}
-      {outputs?.exec && (
-        <div className="absolute -right-4 top-1/2 -translate-y-1/2" data-testid="output-socket">
-          <ClassicPreset.Socket
-            {...outputs.exec}
-          />
-        </div>
-      )}
     </div>
   );
 }

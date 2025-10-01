@@ -1,4 +1,3 @@
-import { ClassicPreset } from 'rete';
 import { Schemes } from '../../utils/jsonSchema';
 
 type Props = {
@@ -6,7 +5,7 @@ type Props = {
 };
 
 export function ConditionNodeComponent({ data }: Props) {
-  const { inputs, outputs, label, data: nodeData } = data;
+  const { label, data: nodeData } = data;
 
   return (
     <div
@@ -20,9 +19,9 @@ export function ConditionNodeComponent({ data }: Props) {
       </div>
 
       <div className="p-2 text-left">
-        {nodeData.imageUrl && (
+        {(nodeData.url || nodeData.imageUrl) && (
           <img
-            src={nodeData.imageUrl}
+            src={nodeData.url || nodeData.imageUrl}
             alt="Node content"
             className="w-full h-auto rounded-md mb-2"
             style={{ maxWidth: '220px', maxHeight: '150px', objectFit: 'contain' }}
@@ -34,31 +33,6 @@ export function ConditionNodeComponent({ data }: Props) {
           </p>
         )}
       </div>
-
-      {/* Input Sockets */}
-      {inputs?.exec && (
-        <div className="absolute -left-4 top-1/2 -translate-y-1/2" data-testid="input-socket">
-          <ClassicPreset.Socket
-            {...inputs.exec}
-          />
-        </div>
-      )}
-
-      {/* Output Sockets */}
-      {outputs?.true && (
-        <div className="absolute -right-4 top-1/4 -translate-y-1/2" data-testid="output-socket-true">
-          <ClassicPreset.Socket
-            {...outputs.true}
-          />
-        </div>
-      )}
-      {outputs?.false && (
-        <div className="absolute -right-4 top-3/4 -translate-y-1/2" data-testid="output-socket-false">
-          <ClassicPreset.Socket
-            {...outputs.false}
-          />
-        </div>
-      )}
     </div>
   );
 }
