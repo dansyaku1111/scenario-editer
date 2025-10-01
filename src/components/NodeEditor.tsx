@@ -2,10 +2,16 @@ import { useEffect, useRef } from 'react';
 import { NodeEditor } from 'rete';
 import { AreaPlugin, AreaExtensions } from 'rete-area-plugin';
 import { ConnectionPlugin, Presets as ConnectionPresets } from 'rete-connection-plugin';
-import { ReactPlugin, Presets as ReactPresets } from 'rete-react-plugin';
+import { ReactPlugin, Presets as ReactPresets, ReactArea2D } from 'rete-react-plugin';
 import { createRoot, Root } from 'react-dom/client';
 import { Schemes } from '../App';
 import GridBackground from './GridBackground';
+import { ActionNodeComponent } from './NodeTypes/ActionNodeComponent';
+import { ConditionNodeComponent } from './NodeTypes/ConditionNodeComponent';
+import { ImageNodeComponent } from './NodeTypes/ImageNodeComponent';
+import { ContentNodeComponent } from './NodeTypes/ContentNodeComponent';
+
+type Area = ReactArea2D<Schemes>;
 
 type EditorProps = {
   setEditor: (editor: NodeEditor<Schemes> | null) => void;
@@ -15,7 +21,7 @@ type EditorProps = {
 export function useEditor(props: EditorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<NodeEditor<Schemes>>();
-  const areaRef = useRef<AreaPlugin<Schemes, any>>();
+  const areaRef = useRef<AreaPlugin<Schemes, Area>>();
 
   // === エディタのセットアップとイベントリスナー登録をまとめて管理するuseEffect ===
   useEffect(() => {
@@ -23,19 +29,38 @@ export function useEditor(props: EditorProps) {
 
     // --- 1. 初回のみ実行する処理 ---
     const editor = new NodeEditor<Schemes>();
-    const area = new AreaPlugin<Schemes, any>(containerRef.current);
+    const area = new AreaPlugin<Schemes, Area>(containerRef.current);
     editorRef.current = editor;
     areaRef.current = area;
 
-    const connection = new ConnectionPlugin<Schemes, any>();
-    const render = new ReactPlugin<Schemes>({ createRoot });
+    const connection = new ConnectionPlugin<Schemes, Area>();
+    const render = new ReactPlugin<Schemes, Area>({ createRoot });
     
     editor.use(area);
     area.use(connection);
     area.use(render);
     
     connection.addPreset(ConnectionPresets.classic.setup());
-    render.addPreset(ReactPresets.classic.setup());
+
+    render.addPreset(ReactPresets.classic.setup({
+      customize: {
+        node(context) {
+          if (context.payload.label === 'Action') {
+            return ActionNodeComponent;
+          }
+          if (context.payload.label === 'Condition') {
+            return ConditionNodeComponent;
+          }
+          if (context.payload.label === 'Image') {
+            return ImageNodeComponent;
+          }
+          if (context.payload.label === 'Content') {
+            return ContentNodeComponent;
+          }
+          return ReactPresets.classic.Node;
+        }
+      }
+    }));
     AreaExtensions.simpleNodesOrder(area);
 
     props.setEditor(editor);

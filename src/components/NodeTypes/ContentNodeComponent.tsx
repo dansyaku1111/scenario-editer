@@ -5,7 +5,7 @@ type Props = {
   data: Schemes['Node'] & { selected?: boolean };
 };
 
-export function ActionNodeComponent({ data }: Props) {
+export function ContentNodeComponent({ data }: Props) {
   const { inputs, outputs, label, data: nodeData } = data;
 
   return (

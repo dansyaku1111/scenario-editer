@@ -5,7 +5,7 @@ type Props = {
   data: Schemes['Node'] & { selected?: boolean };
 };
 
-export function ActionNodeComponent({ data }: Props) {
+export function ConditionNodeComponent({ data }: Props) {
   const { inputs, outputs, label, data: nodeData } = data;
 
   return (
@@ -45,10 +45,17 @@ export function ActionNodeComponent({ data }: Props) {
       )}
 
       {/* Output Sockets */}
-      {outputs?.exec && (
-        <div className="absolute -right-4 top-1/2 -translate-y-1/2" data-testid="output-socket">
+      {outputs?.true && (
+        <div className="absolute -right-4 top-1/4 -translate-y-1/2" data-testid="output-socket-true">
           <ClassicPreset.Socket
-            {...outputs.exec}
+            {...outputs.true}
+          />
+        </div>
+      )}
+      {outputs?.false && (
+        <div className="absolute -right-4 top-3/4 -translate-y-1/2" data-testid="output-socket-false">
+          <ClassicPreset.Socket
+            {...outputs.false}
           />
         </div>
       )}

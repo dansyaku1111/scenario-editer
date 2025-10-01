@@ -6,7 +6,7 @@ import JsonViewer from './components/JsonViewer';
 import EditorPanel from './components/EditorPanel';
 import { exportData, importData } from './utils/jsonHandler';
 import { Schemes } from './utils/jsonSchema';
-import { StartNode, ActionNode, ConditionNode, EndNode, ImageNode } from './components/NodeTypes';
+import { StartNode, ActionNode, ConditionNode, EndNode, ImageNode, ContentNode } from './components/NodeTypes';
 
 export default function App() {
     const [editor, setEditor] = useState<NodeEditor<Schemes> | null>(null);
@@ -19,7 +19,7 @@ export default function App() {
     }, []); // 依存配列は空なので、この関数は一度しか生成されない
 
     // ... (addNode, updateNodeData, handleExport, etc. は変更なし) ...
-    const addNode = async (type: 'start' | 'action' | 'condition' | 'end' | 'image') => {
+    const addNode = async (type: 'start' | 'action' | 'condition' | 'end' | 'image' | 'content') => {
         if (!editor) return;
         let node;
         switch (type) {
@@ -28,6 +28,7 @@ export default function App() {
             case 'condition': node = new ConditionNode('New Condition'); break;
             case 'end': node = new EndNode(); break;
             case 'image': node = new ImageNode(); break;
+            case 'content': node = new ContentNode({}); break;
         }
         await editor.addNode(node);
     };

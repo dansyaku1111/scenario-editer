@@ -1,7 +1,7 @@
 import { ClassicPreset } from 'rete';
 import { execSocket } from './sockets';
 
-export class ActionNode extends ClassicPreset.Node<
+export class ContentNode extends ClassicPreset.Node<
   { exec: ClassicPreset.Socket },
   { exec: ClassicPreset.Socket },
   {}
@@ -9,13 +9,13 @@ export class ActionNode extends ClassicPreset.Node<
   width = 220;
   height = 280;
   data: { title: string; text: string; imageUrl: string } = {
-    title: 'Action Node',
-    text: 'This is the default action text.',
+    title: 'Node Title',
+    text: 'This is the default text content for the node.',
     imageUrl: 'https://placehold.co/200x150'
   };
 
-  constructor(initialData?: Partial<ActionNode['data']>) {
-    super('Action');
+  constructor(initialData?: Partial<ContentNode['data']>) {
+    super('Content');
     this.addInput('exec', new ClassicPreset.Input(execSocket, 'Exec'));
     this.addOutput('exec', new ClassicPreset.Output(execSocket, 'Exec'));
     if (initialData) {

@@ -1,18 +1,22 @@
 import { ClassicPreset } from 'rete';
 
-const initialImageUrl = 'https://placehold.co/150';
-
 export class ImageNode extends ClassicPreset.Node<
-    {},
-    {},
-    {} // Controlを削除
+  {},
+  {},
+  {}
 > {
-    width = 180;
-    height = 80; // 高さを調整
-    data: { url: string } = { url: '' }; // dataプロパティを定義
+  width = 220;
+  height = 280;
+  data: { title: string; text: string; imageUrl: string } = {
+    title: 'Image Node',
+    text: 'This is the default image text.',
+    imageUrl: 'https://placehold.co/200x150'
+  };
 
-    constructor(initial?: string) {
-        super('Image');
-        this.data.url = initial || initialImageUrl; // dataに初期値を設定
+  constructor(initialData?: Partial<ImageNode['data']>) {
+    super('Image');
+    if (initialData) {
+      this.data = { ...this.data, ...initialData };
     }
+  }
 }
