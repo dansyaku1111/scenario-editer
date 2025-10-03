@@ -1,15 +1,20 @@
 import { useEffect, useRef } from 'react';
 import { NodeEditor } from 'rete';
 import { AreaPlugin, AreaExtensions } from 'rete-area-plugin';
-import { ConnectionPlugin, Presets as ConnectionPresets } from 'rete-connection-plugin';
-import { ReactPlugin, Presets as ReactPresets, ReactArea2D } from 'rete-react-plugin';
+import {
+  ConnectionPlugin,
+  Presets as ConnectionPresets,
+} from 'rete-connection-plugin';
+import {
+  ReactPlugin,
+  Presets as ReactPresets,
+  ReactArea2D,
+} from 'rete-react-plugin';
 import { createRoot, Root } from 'react-dom/client';
 import { Schemes } from '../App';
 import GridBackground from './GridBackground';
-import { ActionNodeComponent } from './NodeTypes/ActionNodeComponent';
-import { ConditionNodeComponent } from './NodeTypes/ConditionNodeComponent';
-import { ImageNodeComponent } from './NodeTypes/ImageNodeComponent';
-import { ContentNodeComponent } from './NodeTypes/ContentNodeComponent';
+import { CustomContentControl } from './NodeTypes/controls';
+import { CustomContentComponent } from './NodeTypes/CustomContentComponent';
 
 type Area = ReactArea2D<Schemes>;
 
@@ -35,32 +40,25 @@ export function useEditor(props: EditorProps) {
 
     const connection = new ConnectionPlugin<Schemes, Area>();
     const render = new ReactPlugin<Schemes, Area>({ createRoot });
-    
+
     editor.use(area);
     area.use(connection);
     area.use(render);
-    
+
     connection.addPreset(ConnectionPresets.classic.setup());
 
-    render.addPreset(ReactPresets.classic.setup({
-      customize: {
-        node(context) {
-          if (context.payload.label === 'Action') {
-            return ActionNodeComponent;
-          }
-          if (context.payload.label === 'Condition') {
-            return ConditionNodeComponent;
-          }
-          if (context.payload.label === 'Image') {
-            return ImageNodeComponent;
-          }
-          if (context.payload.label === 'Content') {
-            return ContentNodeComponent;
-          }
-          return ReactPresets.classic.Node;
-        }
-      }
-    }));
+    render.addPreset(
+      ReactPresets.classic.setup({
+        customize: {
+          control(context) {
+            if (context.payload instanceof CustomContentControl) {
+              return CustomContentComponent;
+            }
+            return ReactPresets.classic.Control;
+          },
+        },
+      })
+    );
     AreaExtensions.simpleNodesOrder(area);
 
     props.setEditor(editor);
@@ -71,47 +69,64 @@ export function useEditor(props: EditorProps) {
     AreaExtensions.selectableNodes(area, selector, { accumulating });
 
     const handleSelection = () => {
-        const selected = Array.from(selector.entities.values());
-        if (selected.length === 1 && 'label' in selected[0] && selected[0].label === 'node') {
-            props.onNodeSelected(editor.getNode(selected[0].id));
-        } else {
-            props.onNodeSelected(null);
-        }
+      const selected = Array.from(selector.entities.values());
+      if (
+        selected.length === 1 &&
+        'label' in selected[0] &&
+        selected[0].label === 'node'
+      ) {
+        props.onNodeSelected(editor.getNode(selected[0].id));
+      } else {
+        props.onNodeSelected(null);
+      }
     };
-    const selectionDisposer = area.addPipe(context => {
-        if (context.type === 'nodepicked' || context.type === 'pointerup' || context.type === 'nodedragged') {
-            setTimeout(handleSelection, 0);
-        }
-        return context;
+    const selectionDisposer = area.addPipe((context) => {
+      if (
+        context.type === 'nodepicked' ||
+        context.type === 'pointerup' ||
+        context.type === 'nodedragged'
+      ) {
+        setTimeout(handleSelection, 0);
+      }
+      return context;
     });
 
     const handleKeyDown = async (e: KeyboardEvent) => {
-        const target = e.target as HTMLElement;
-        // 入力フィールドにフォーカスがある場合は何もしない
-        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
-            return;
-        }
+      const target = e.target as HTMLElement;
+      // 入力フィールドにフォーカスがある場合は何もしない
+      if (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable
+      ) {
+        return;
+      }
 
-        if (e.key === 'Delete') {
-            const nodesToDelete = Array.from(selector.entities.values()).filter(e => 'label' in e && e.label === 'node').map(e => e.id);
-            if (nodesToDelete.length === 0) return;
-            for (const nodeId of nodesToDelete) {
-                const connections = editor.getConnections().filter(c => c.source === nodeId || c.target === nodeId);
-                for (const connection of connections) await editor.removeConnection(connection.id);
-                await editor.removeNode(nodeId);
-            }
-            handleSelection();
+      if (e.key === 'Delete') {
+        const nodesToDelete = Array.from(selector.entities.values())
+          .filter((e) => 'label' in e && e.label === 'node')
+          .map((e) => e.id);
+        if (nodesToDelete.length === 0) return;
+        for (const nodeId of nodesToDelete) {
+          const connections = editor
+            .getConnections()
+            .filter((c) => c.source === nodeId || c.target === nodeId);
+          for (const connection of connections)
+            await editor.removeConnection(connection.id);
+          await editor.removeNode(nodeId);
         }
+        handleSelection();
+      }
     };
     document.addEventListener('keydown', handleKeyDown);
-    
+
     // --- 3. クリーンアップ関数 ---
     return () => {
-        document.removeEventListener('keydown', handleKeyDown);
-        if (typeof selectionDisposer === 'function') {
-            selectionDisposer(); // イベントリスナーを解除
-        }
-        // ここでarea.destroy()は呼ばない。コンポーネント自体が消える時に呼ぶ
+      document.removeEventListener('keydown', handleKeyDown);
+      if (typeof selectionDisposer === 'function') {
+        selectionDisposer(); // イベントリスナーを解除
+      }
+      // ここでarea.destroy()は呼ばない。コンポーネント自体が消える時に呼ぶ
     };
   }, [props.setEditor]); // setEditorが変更されたら再実行
 
@@ -119,7 +134,7 @@ export function useEditor(props: EditorProps) {
   useEffect(() => {
     const area = areaRef.current;
     if (!area) return;
-    
+
     const snapSize = 16;
     let gridRoot: Root | null = null;
     let gridContainer: HTMLDivElement | null = null;
@@ -131,46 +146,49 @@ export function useEditor(props: EditorProps) {
     backgroundHolder.insertBefore(gridContainer, backgroundHolder.firstChild);
     gridRoot = createRoot(gridContainer);
     gridRoot.render(<GridBackground size={snapSize} />);
-    disposer = area.addPipe(context => {
-        if (context.type === 'nodetranslated') {
-            const id = context.data.id;
-            const view = area.nodeViews.get(id);
-            if (view) {
-                const { x, y } = view.position;
-                const snappedX = Math.round(x / snapSize) * snapSize;
-                const snappedY = Math.round(y / snapSize) * snapSize;
-                // 現在位置がスナップ後の位置と異なるときだけ translate を呼ぶ
-                if (x !== snappedX || y !== snappedY) {
-                    view.translate(snappedX, snappedY);
-                }
-            }
+    disposer = area.addPipe((context) => {
+      if (context.type === 'nodetranslated') {
+        const id = context.data.id;
+        const view = area.nodeViews.get(id);
+        if (view) {
+          const { x, y } = view.position;
+          const snappedX = Math.round(x / snapSize) * snapSize;
+          const snappedY = Math.round(y / snapSize) * snapSize;
+          // 現在位置がスナップ後の位置と異なるときだけ translate を呼ぶ
+          if (x !== snappedX || y !== snappedY) {
+            view.translate(snappedX, snappedY);
+          }
         }
-        return context;
+      }
+      return context;
     });
 
     return () => {
-        if (disposer) disposer();
+      if (disposer) disposer();
 
-        // unmountとDOM操作を非同期にして、Reactのレンダリングサイクルとの競合を避ける
-        setTimeout(() => {
-            if (gridRoot) {
-                gridRoot.unmount();
-            }
-            if (gridContainer && area.area.content.holder.contains(gridContainer)) {
-                area.area.content.holder.removeChild(gridContainer);
-            }
-        }, 0);
+      // unmountとDOM操作を非同期にして、Reactのレンダリングサイクルとの競合を避ける
+      setTimeout(() => {
+        if (gridRoot) {
+          gridRoot.unmount();
+        }
+        if (
+          gridContainer &&
+          area.area.content.holder.contains(gridContainer)
+        ) {
+          area.area.content.holder.removeChild(gridContainer);
+        }
+      }, 0);
     };
   }, []);
-  
+
   // === コンポーネントが完全にアンマウントされる時の最終クリーンアップ ===
   useEffect(() => {
-      return () => {
-          props.setEditor(null);
-          if (areaRef.current) {
-              areaRef.current.destroy();
-          }
+    return () => {
+      props.setEditor(null);
+      if (areaRef.current) {
+        areaRef.current.destroy();
       }
+    };
   }, []);
 
   return { ref: containerRef };
