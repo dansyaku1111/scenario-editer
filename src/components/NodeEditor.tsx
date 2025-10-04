@@ -10,7 +10,7 @@ import { ImageControlComponent } from './NodeTypes/ImageControl';
 type Area = ReactArea2D<any>;
 
 type EditorProps = {
-  setEditor: (editor: NodeEditor<any> | null) => void;
+  setEditor: (editor: NodeEditor<any> | null, area?: AreaPlugin<any, Area> | null) => void;
   onNodeSelected: (node: any | null) => void;
 };
 
@@ -64,7 +64,7 @@ export function useEditor(props: EditorProps) {
     }));
     AreaExtensions.simpleNodesOrder(area);
 
-    props.setEditor(editor);
+    props.setEditor(editor, area);
 
     // --- 2. 毎回のレンダリングで設定が必要なイベントハンドラ ---
     const selector = AreaExtensions.selector();
@@ -190,7 +190,7 @@ export function useEditor(props: EditorProps) {
   // === コンポーネントが完全にアンマウントされる時の最終クリーンアップ ===
   useEffect(() => {
       return () => {
-          props.setEditor(null);
+          props.setEditor(null, null);
           if (areaRef.current) {
               areaRef.current.destroy();
           }

@@ -21,6 +21,7 @@ import {
 
 export default function App() {
     const [editor, setEditor] = useState<NodeEditor<any> | null>(null);
+    const [area, setArea] = useState<any>(null);
     const [jsonData, setJsonData] = useState<string>('// JSONデータがここに表示されます');
     const [selectedNode, setSelectedNode] = useState<any | null>(null);
 
@@ -28,6 +29,11 @@ export default function App() {
     const handleNodeSelected = useCallback((node: any | null) => {
         setSelectedNode(node);
     }, []); // 依存配列は空なので、この関数は一度しか生成されない
+    
+    const handleSetEditor = useCallback((newEditor: NodeEditor<any> | null, newArea?: any) => {
+        setEditor(newEditor);
+        setArea(newArea || null);
+    }, []);
 
     // ... (addNode, updateNodeData, handleExport, etc. は変更なし) ...
     const addNode = async (type: 'start' | 'action' | 'condition' | 'end' | 'image' | 'content' | 'character' | 'event' | 'timer' | 'external-resource') => {
@@ -74,8 +80,19 @@ export default function App() {
             });
         }
     };
-    const handleExport = async () => { if(editor) await exportData(editor) };
-    const handleImport = async (file: File) => { if(editor) await importData(editor, file) };
+    const handleExport = async () => { 
+        if(editor && area) {
+            console.log('Exporting with editor and area:', editor, area);
+            await exportData(editor, area);
+        } else {
+            console.warn('Cannot export: editor or area not available', { editor, area });
+        }
+    };
+    const handleImport = async (file: File) => { 
+        if(editor && area) {
+            await importData(editor, area, file);
+        }
+    };
     const clearCanvas = async () => { if(editor) await editor.clear() };
 
     return (
@@ -90,7 +107,7 @@ export default function App() {
             <div className="flex flex-col md:flex-row gap-4 mt-4">
                 <div className="flex-grow bg-white rounded-lg shadow-lg p-4 relative" style={{ height: '75vh' }}>
                     <NodeEditorComponent
-                        setEditor={setEditor}
+                        setEditor={handleSetEditor}
                         onNodeSelected={handleNodeSelected} // メモ化された関数を渡す
                     />
                 </div>

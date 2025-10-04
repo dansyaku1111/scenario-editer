@@ -1,0 +1,56 @@
+{
+  "nodes": [
+    {
+      "id": "test-start-1",
+      "label": "Start",
+      "type": "start",
+      "x": 100,
+      "y": 100,
+      "data": {
+        "title": "Start"
+      }
+    },
+    {
+      "id": "test-action-1",
+      "label": "Action",
+      "type": "action",
+      "x": 350,
+      "y": 100,
+      "data": {
+        "title": "Test Action",
+        "text": "This is a test action node",
+        "imageUrl": "https://placehold.co/200x150"
+      }
+    },
+    {
+      "id": "test-end-1",
+      "label": "End",
+      "type": "end",
+      "x": 600,
+      "y": 100,
+      "data": {
+        "title": "End"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "id": "conn-1",
+      "source": "test-start-1",
+      "sourceOutput": "exec",
+      "target": "test-action-1",
+      "targetInput": "exec"
+    },
+    {
+      "id": "conn-2",
+      "source": "test-action-1",
+      "sourceOutput": "exec",
+      "target": "test-end-1",
+      "targetInput": "exec"
+    }
+  ],
+  "metadata": {
+    "version": "2.0.0",
+    "exported_at": "2024-01-01T00:00:00.000Z"
+  }
+}
