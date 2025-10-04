@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'; // useCallbackをインポート
+import { useState, useCallback } from 'react';
 import { NodeEditor } from 'rete';
 import NodeEditorComponent from './components/NodeEditor';
 import Toolbar from './components/Toolbar';
@@ -6,41 +6,72 @@ import JsonViewer from './components/JsonViewer';
 import EditorPanel from './components/EditorPanel';
 import { exportData, importData } from './utils/jsonHandler';
 import { Schemes } from './utils/jsonSchema';
-import { StartNode, ActionNode, ConditionNode, EndNode, ImageNode, ContentNode } from './components/NodeTypes';
+import { 
+    StartNode, 
+    ActionNode, 
+    ConditionNode, 
+    EndNode, 
+    ImageNode, 
+    ContentNode,
+    CharacterNode,
+    EventNode,
+    TimerNode,
+    ExternalResourceNode
+} from './components/NodeTypes';
 
 export default function App() {
-    const [editor, setEditor] = useState<NodeEditor<Schemes> | null>(null);
+    const [editor, setEditor] = useState<NodeEditor<any> | null>(null);
     const [jsonData, setJsonData] = useState<string>('// JSONデータがここに表示されます');
-    const [selectedNode, setSelectedNode] = useState<Schemes['Node'] | null>(null);
+    const [selectedNode, setSelectedNode] = useState<any | null>(null);
 
     // ▼▼▼ useCallbackで関数をメモ化（安定化）させる ▼▼▼
-    const handleNodeSelected = useCallback((node: Schemes['Node'] | null) => {
+    const handleNodeSelected = useCallback((node: any | null) => {
         setSelectedNode(node);
     }, []); // 依存配列は空なので、この関数は一度しか生成されない
 
     // ... (addNode, updateNodeData, handleExport, etc. は変更なし) ...
-    const addNode = async (type: 'start' | 'action' | 'condition' | 'end' | 'image' | 'content') => {
+    const addNode = async (type: 'start' | 'action' | 'condition' | 'end' | 'image' | 'content' | 'character' | 'event' | 'timer' | 'external-resource') => {
         if (!editor) return;
         let node;
         switch (type) {
             case 'start': node = new StartNode(); break;
-            case 'action': node = new ActionNode('New Action'); break;
-            case 'condition': node = new ConditionNode('New Condition'); break;
+            case 'action': node = new ActionNode(); break;
+            case 'condition': node = new ConditionNode(); break;
             case 'end': node = new EndNode(); break;
             case 'image': node = new ImageNode(); break;
-            case 'content': node = new ContentNode({}); break;
+            case 'content': node = new ContentNode(); break;
+            case 'character': node = new CharacterNode(); break;
+            case 'event': node = new EventNode(); break;
+            case 'timer': node = new TimerNode(); break;
+            case 'external-resource': node = new ExternalResourceNode(); break;
         }
         await editor.addNode(node);
     };
-    const updateNodeData = (nodeId: string, data: Partial<Schemes['Node']['data']>) => {
+    const updateNodeData = (nodeId: string, data: Partial<any>) => {
         if (!editor) return;
 
         const node = editor.getNode(nodeId);
-        if (node) {
+        if (node && 'data' in node) {
             // ノードのデータを更新
             node.data = { ...node.data, ...data };
-            // EditorPanelを再描画するために、selectedNodeの状態を更新
-            setSelectedNode({ ...node });
+            
+            // ノードにupdateDataメソッドがあれば呼び出す（Controlを再作成）
+            if (typeof (node as any).updateData === 'function') {
+                (node as any).updateData(data);
+            }
+            
+            // EditorPanelを再描画
+            setSelectedNode({ ...node } as any);
+            
+            // Rete.jsのビューを更新するために、エディタ全体を再レンダリング
+            // これによりImageControlが再描画される
+            editor.getNodes().forEach(n => {
+                if (n.id === nodeId) {
+                    // 強制的にノードビューを更新
+                    const event = new CustomEvent('render', { detail: { type: 'node', data: n } });
+                    window.dispatchEvent(event);
+                }
+            });
         }
     };
     const handleExport = async () => { if(editor) await exportData(editor) };

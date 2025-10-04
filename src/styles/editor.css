@@ -31,6 +31,25 @@
     cursor: move;
     user-select: none;
     z-index: 1; /* グリッドより前面に表示 */
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ノード内のControl要素のスタイル */
+[data-testid='node'] .control {
+    width: 100%;
+    margin: 8px 0;
+    position: relative;
+    z-index: 0;
+}
+
+/* ImageControlのコンテナ */
+[data-testid='node'] .image-control {
+    position: relative;
+    width: 100%;
+    max-width: 220px;
+    margin: 0 auto;
 }
 
 [data-testid='node'].selected {

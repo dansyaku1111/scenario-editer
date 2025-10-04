@@ -4,37 +4,33 @@ import { AreaPlugin, AreaExtensions } from 'rete-area-plugin';
 import { ConnectionPlugin, Presets as ConnectionPresets } from 'rete-connection-plugin';
 import { ReactPlugin, Presets as ReactPresets, ReactArea2D } from 'rete-react-plugin';
 import { createRoot, Root } from 'react-dom/client';
-import { Schemes } from '../App';
 import GridBackground from './GridBackground';
-import { ActionNodeComponent } from './NodeTypes/ActionNodeComponent';
-import { ConditionNodeComponent } from './NodeTypes/ConditionNodeComponent';
-import { ImageNodeComponent } from './NodeTypes/ImageNodeComponent';
-import { ContentNodeComponent } from './NodeTypes/ContentNodeComponent';
+import { ImageControlComponent } from './NodeTypes/ImageControl';
 
-type Area = ReactArea2D<Schemes>;
+type Area = ReactArea2D<any>;
 
 type EditorProps = {
-  setEditor: (editor: NodeEditor<Schemes> | null) => void;
-  onNodeSelected: (node: Schemes['Node'] | null) => void;
+  setEditor: (editor: NodeEditor<any> | null) => void;
+  onNodeSelected: (node: any | null) => void;
 };
 
 export function useEditor(props: EditorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const editorRef = useRef<NodeEditor<Schemes>>();
-  const areaRef = useRef<AreaPlugin<Schemes, Area>>();
+  const editorRef = useRef<NodeEditor<any>>();
+  const areaRef = useRef<AreaPlugin<any, Area>>();
 
   // === エディタのセットアップとイベントリスナー登録をまとめて管理するuseEffect ===
   useEffect(() => {
     if (!containerRef.current) return;
 
     // --- 1. 初回のみ実行する処理 ---
-    const editor = new NodeEditor<Schemes>();
-    const area = new AreaPlugin<Schemes, Area>(containerRef.current);
+    const editor = new NodeEditor<any>();
+    const area = new AreaPlugin<any, Area>(containerRef.current);
     editorRef.current = editor;
     areaRef.current = area;
 
-    const connection = new ConnectionPlugin<Schemes, Area>();
-    const render = new ReactPlugin<Schemes, Area>({ createRoot });
+    const connection = new ConnectionPlugin<any, Area>();
+    const render = new ReactPlugin<any, Area>({ createRoot });
     
     editor.use(area);
     area.use(connection);
@@ -42,22 +38,15 @@ export function useEditor(props: EditorProps) {
     
     connection.addPreset(ConnectionPresets.classic.setup());
 
+    // デフォルトのノードレンダリングを使用（ソケットの接続機能を保持）
+    // カスタムControlコンポーネントを登録
     render.addPreset(ReactPresets.classic.setup({
       customize: {
-        node(context) {
-          if (context.payload.label === 'Action') {
-            return ActionNodeComponent;
+        control(context) {
+          if (context.payload.constructor.name === 'ImageControl') {
+            return ImageControlComponent;
           }
-          if (context.payload.label === 'Condition') {
-            return ConditionNodeComponent;
-          }
-          if (context.payload.label === 'Image') {
-            return ImageNodeComponent;
-          }
-          if (context.payload.label === 'Content') {
-            return ContentNodeComponent;
-          }
-          return ReactPresets.classic.Node;
+          return ReactPresets.classic.Control;
         }
       }
     }));
@@ -78,7 +67,7 @@ export function useEditor(props: EditorProps) {
             props.onNodeSelected(null);
         }
     };
-    const selectionDisposer = area.addPipe(context => {
+    const selectionDisposer: any = area.addPipe(context => {
         if (context.type === 'nodepicked' || context.type === 'pointerup' || context.type === 'nodedragged') {
             setTimeout(handleSelection, 0);
         }
@@ -123,7 +112,7 @@ export function useEditor(props: EditorProps) {
     const snapSize = 16;
     let gridRoot: Root | null = null;
     let gridContainer: HTMLDivElement | null = null;
-    let disposer: (() => void) | null = null;
+    let disposer: any = null;
 
     gridContainer = document.createElement('div');
     gridContainer.className = 'grid-background';

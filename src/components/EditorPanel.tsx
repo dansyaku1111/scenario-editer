@@ -1,7 +1,7 @@
-import { Schemes } from '../App';
+import { Schemes } from '../utils/jsonSchema';
 
 type Props = {
-    node: Schemes['Node'] | null;
+    node: any | null;
     onUpdate: (nodeId: string, data: { [key: string]: any }) => void;
 };
 
@@ -43,7 +43,7 @@ export default function EditorPanel({ node, onUpdate }: Props) {
                     accept="image/*"
                     className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                 />
-                {node.data && node.data.url && <img src={node.data.url} alt="preview" className="mt-2 rounded-md max-w-full" />}
+                {node.data && (node.data as any).url && <img src={(node.data as any).url} alt="preview" className="mt-2 rounded-md max-w-full" />}
             </div>
         );
 
@@ -56,7 +56,7 @@ export default function EditorPanel({ node, onUpdate }: Props) {
                             <label htmlFor="node-text" className="block text-sm font-medium text-gray-700">内容</label>
                             <textarea
                                 id="node-text"
-                                value={node.data.text || ''}
+                                value={(node.data as any)?.text || ''}
                                 onChange={handleTextChange}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                 rows={5}

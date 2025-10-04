@@ -8,6 +8,8 @@ export class StartNode extends ClassicPreset.Node<
 > {
     width = 180;
     height = 80;
+    data: { title?: string } = { title: 'Start' };
+    
     constructor() {
         super('Start');
         this.addOutput('exec', new ClassicPreset.Output(execSocket, 'Exec'));

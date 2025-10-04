@@ -1,35 +1,55 @@
 import { ClassicPreset, NodeEditor } from 'rete';
 import { AreaPlugin } from 'rete-area-plugin';
-import { Schemes } from '../App'; 
 import { ScenarioData, NodeData, ConnectionData } from './jsonSchema';
-import { StartNode, ActionNode, ConditionNode, EndNode, ImageNode } from '../components/NodeTypes';
+import { 
+    StartNode, 
+    ActionNode, 
+    ConditionNode, 
+    EndNode, 
+    ImageNode, 
+    ContentNode,
+    CharacterNode,
+    EventNode,
+    TimerNode,
+    ExternalResourceNode
+} from '../components/NodeTypes';
 
-function getNodeSpecificType(node: Schemes['Node']): 'start' | 'action' | 'condition' | 'end' | 'image' {
+function getNodeSpecificType(node: any): NodeData['type'] {
     if (node instanceof StartNode) return 'start';
     if (node instanceof ActionNode) return 'action';
     if (node instanceof ConditionNode) return 'condition';
     if (node instanceof EndNode) return 'end';
     if (node instanceof ImageNode) return 'image';
+    if (node instanceof ContentNode) return 'content';
+    if (node instanceof CharacterNode) return 'character';
+    if (node instanceof EventNode) return 'event';
+    if (node instanceof TimerNode) return 'timer';
+    if (node instanceof ExternalResourceNode) return 'external-resource';
     throw new Error('Unknown node type');
 }
 
-export async function exportData(editor: NodeEditor<Schemes>): Promise<any> { // 戻り値の型を一旦anyに
-    const area = editor.getPlugin(AreaPlugin);
-    const nodes: any[] = []; // 型を一旦anyに
+export async function exportData(editor: NodeEditor<any>): Promise<any> {
+    const area = (editor as any).getPlugin?.(AreaPlugin);
+    const nodes: any[] = [];
     const connections: ConnectionData[] = [];
 
     for (const node of editor.getNodes()) {
-        const pos = area.nodeViews.get(node.id)?.position;
-        nodes.push({
+        const pos = area?.nodeViews?.get(node.id)?.position;
+        const nodeData: any = {
             id: node.id,
             label: node.label,
             type: getNodeSpecificType(node),
-            data: node.data, // node.dataを直接保存
             x: pos?.x || 0,
             y: pos?.y || 0
-        });
+        };
+        
+        // Add data if it exists
+        if ('data' in node && node.data) {
+            nodeData.data = node.data;
+        }
+        
+        nodes.push(nodeData);
     }
-
 
     for (const conn of editor.getConnections()) {
         connections.push({
@@ -61,24 +81,31 @@ export async function exportData(editor: NodeEditor<Schemes>): Promise<any> { //
     return data;
 }
 
-export async function importData(editor: NodeEditor<Schemes>, data: any) { // dataの型を一旦anyに
+export async function importData(editor: NodeEditor<any>, data: any) {
     await editor.clear();
-    const area = editor.getPlugin(AreaPlugin);
+    const area = (editor as any).getPlugin?.(AreaPlugin);
 
     for (const nodeData of data.nodes) {
-        let node: Schemes['Node'];
+        let node: any;
         switch (nodeData.type) {
             case 'start': node = new StartNode(); break;
-            case 'action': node = new ActionNode(nodeData.data?.text); break;
-            case 'condition': node = new ConditionNode(nodeData.data?.text); break;
+            case 'action': node = new ActionNode(nodeData.data); break;
+            case 'condition': node = new ConditionNode(nodeData.data); break;
             case 'end': node = new EndNode(); break;
-            case 'image': node = new ImageNode(nodeData.data?.url); break;
-            default: continue; // 不明なタイプはスキップ
+            case 'image': node = new ImageNode(nodeData.data); break;
+            case 'content': node = new ContentNode(nodeData.data); break;
+            case 'character': node = new CharacterNode(nodeData.data); break;
+            case 'event': node = new EventNode(nodeData.data); break;
+            case 'timer': node = new TimerNode(nodeData.data); break;
+            case 'external-resource': node = new ExternalResourceNode(nodeData.data); break;
+            default: continue; // Unknown types are skipped
         }
         node.id = nodeData.id;
         
         await editor.addNode(node);
-        await area.translate(node.id, { x: nodeData.x, y: nodeData.y });
+        if (area) {
+            await area.translate(node.id, { x: nodeData.x, y: nodeData.y });
+        }
     }
 
     for (const connData of data.connections) {
