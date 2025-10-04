@@ -7,11 +7,12 @@ export class ExternalResourceNode extends ClassicPreset.Node<
   { exec: ClassicPreset.Socket; url: ClassicPreset.Socket; data: ClassicPreset.Socket },  { image?: ImageControl }
 > {
   width = 240;
-  height = 280;
+  height = 320;
   data: { 
     title: string;
     text: string;
     imageUrl: string;
+    url?: string;
     resourceType?: 'url' | 'api' | 'file' | 'database';
     resourceUrl?: string;
     method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -37,5 +38,22 @@ export class ExternalResourceNode extends ClassicPreset.Node<
     if (initialData) {
       this.data = { ...this.data, ...initialData };
     }
+    
+    // 画像Controlを追加（url と imageUrl の両方をチェック）
+    const imageUrl = (this.data as any).url || this.data.imageUrl;
+    this.addControl('image', new ImageControl(imageUrl, this.data.text));
+  }
+  
+  // データ更新時にControlも更新
+  updateData(newData: Partial<ExternalResourceNode['data']>) {
+    this.data = { ...this.data, ...newData };
+    
+    // Controlを削除して再作成
+    if (this.controls.image) {
+      this.removeControl('image');
+    }
+    
+    const imageUrl = (this.data as any).url || this.data.imageUrl;
+    this.addControl('image', new ImageControl(imageUrl, this.data.text));
   }
 }

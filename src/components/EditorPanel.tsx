@@ -48,8 +48,21 @@ export default function EditorPanel({ node, onUpdate }: Props) {
         );
 
         switch (node.label) {
+            case 'Start':
+            case 'End':
+                // Start/Endノードは画像のみ編集可能
+                return imageEditor;
+            case 'Image':
+                // Imageノードも画像のみ編集可能
+                return imageEditor;
             case 'Action':
             case 'Condition':
+            case 'Content':
+            case 'Character':
+            case 'Event':
+            case 'Timer':
+            case 'External Resource':
+                // テキストと画像の両方を編集可能
                 return (
                     <div className="space-y-4">
                         <div>
@@ -65,8 +78,6 @@ export default function EditorPanel({ node, onUpdate }: Props) {
                         {imageEditor}
                     </div>
                 );
-            case 'Image':
-                 return imageEditor;
             default:
                 return <p className="text-gray-500">このノードには編集可能な項目がありません。</p>;
         }

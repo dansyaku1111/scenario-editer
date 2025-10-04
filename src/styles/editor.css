@@ -21,19 +21,26 @@
     z-index: 0; /* 他の要素の背面に表示 */
 }
 
+/* Draw.io スタイルのノード基本スタイル */
 [data-testid='node'] {
     background: white;
     border: 2px solid #3b82f6;
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 12px;
     min-width: 180px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.1);
     cursor: move;
     user-select: none;
-    z-index: 1; /* グリッドより前面に表示 */
+    z-index: 1;
     position: relative;
     display: flex;
     flex-direction: column;
+    transition: all 0.2s ease;
+}
+
+[data-testid='node']:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
 }
 
 /* ノード内のControl要素のスタイル */
@@ -54,7 +61,7 @@
 
 [data-testid='node'].selected {
     border-color: #ef4444;
-    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.3), 0 4px 12px rgba(239, 68, 68, 0.2);
 }
 
 .node-header {
@@ -64,45 +71,114 @@
     border-bottom: 1px solid #e5e7eb;
 }
 
-/* Custom node styling based on type */
-.start-node {
-    background: #dcfce7;
+/* Custom node styling based on type - Draw.io inspired */
+/* Start Node - Green gradient */
+[data-testid='node'][data-node-type='Start'] {
+    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
     border-color: #22c55e;
+    border-width: 2.5px;
 }
 
-.action-node {
-    background: #dbeafe;
+/* Action Node - Blue gradient */
+[data-testid='node'][data-node-type='Action'] {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
     border-color: #3b82f6;
 }
 
-.condition-node {
-    background: #fef3c7;
+/* Character Node - Purple gradient */
+[data-testid='node'][data-node-type='Character'] {
+    background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+    border-color: #8b5cf6;
+}
+
+/* Condition Node - Amber gradient */
+[data-testid='node'][data-node-type='Condition'] {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
     border-color: #f59e0b;
 }
 
-.end-node {
-    background: #fee2e2;
-    border-color: #ef4444;
+/* Content Node - Cyan gradient */
+[data-testid='node'][data-node-type='Content'] {
+    background: linear-gradient(135deg, #cffafe 0%, #a5f3fc 100%);
+    border-color: #06b6d4;
 }
 
+/* Event Node - Pink gradient */
+[data-testid='node'][data-node-type='Event'] {
+    background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+    border-color: #ec4899;
+}
+
+/* Timer Node - Orange gradient */
+[data-testid='node'][data-node-type='Timer'] {
+    background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
+    border-color: #f97316;
+}
+
+/* Image Node - Indigo gradient */
+[data-testid='node'][data-node-type='Image'] {
+    background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+    border-color: #6366f1;
+}
+
+/* External Resource Node - Teal gradient */
+[data-testid='node'][data-node-type='External Resource'] {
+    background: linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%);
+    border-color: #14b8a6;
+}
+
+/* End Node - Red gradient */
+[data-testid='node'][data-node-type='End'] {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    border-color: #ef4444;
+    border-width: 2.5px;
+}
+
+/* Socket styling - Draw.io style */
 [data-testid='socket'] {
-    width: 14px;
-    height: 14px;
-    background: #94a3b8;
-    border: 2px solid white;
+    width: 16px;
+    height: 16px;
+    background: #ffffff;
+    border: 3px solid #3b82f6;
     border-radius: 9999px;
-    z-index: 2; /* ノードよりさらに前面に */
+    z-index: 2;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
 }
 
 [data-testid='socket']:hover {
     background: #3b82f6;
+    border-color: #2563eb;
+    transform: scale(1.2);
+    box-shadow: 0 3px 6px rgba(59, 130, 246, 0.4);
 }
 
+/* Connection styling - Draw.io style with arrow markers */
 [data-testid='connection'] {
     stroke: #94a3b8;
-    stroke-width: 3;
+    stroke-width: 2.5;
     fill: none;
     z-index: 1;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+    marker-end: url(#arrowhead);
+}
+
+[data-testid='connection']:hover {
+    stroke: #3b82f6;
+    stroke-width: 3;
+    filter: drop-shadow(0 2px 4px rgba(59, 130, 246, 0.3));
+}
+
+[data-testid='connection'].selected {
+    stroke: #ef4444;
+    stroke-width: 3;
+    filter: drop-shadow(0 2px 4px rgba(239, 68, 68, 0.3));
+}
+
+/* Connection path with smooth curves */
+[data-testid='connection'] path {
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
 .json-viewer {

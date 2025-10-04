@@ -7,11 +7,12 @@ export class EventNode extends ClassicPreset.Node<
   { exec: ClassicPreset.Socket; time: ClassicPreset.Socket; content: ClassicPreset.Socket },  { image?: ImageControl }
 > {
   width = 240;
-  height = 300;
+  height = 320;
   data: { 
     title: string;
     text: string;
     imageUrl: string;
+    url?: string;
     eventName?: string;
     timestamp?: string;
     duration?: number;
@@ -38,5 +39,24 @@ export class EventNode extends ClassicPreset.Node<
     if (initialData) {
       this.data = { ...this.data, ...initialData };
     }
+    
+    // 画像Controlを追加（url と imageUrl の両方をチェック）
+    const imageUrl = (this.data as any).url || this.data.imageUrl;
+    const displayText = `${this.data.eventName ? this.data.eventName + '\n' : ''}${this.data.text}`;
+    this.addControl('image', new ImageControl(imageUrl, displayText));
+  }
+  
+  // データ更新時にControlも更新
+  updateData(newData: Partial<EventNode['data']>) {
+    this.data = { ...this.data, ...newData };
+    
+    // Controlを削除して再作成
+    if (this.controls.image) {
+      this.removeControl('image');
+    }
+    
+    const imageUrl = (this.data as any).url || this.data.imageUrl;
+    const displayText = `${this.data.eventName ? this.data.eventName + '\n' : ''}${this.data.text}`;
+    this.addControl('image', new ImageControl(imageUrl, displayText));
   }
 }

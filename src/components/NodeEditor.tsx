@@ -47,6 +47,18 @@ export function useEditor(props: EditorProps) {
             return ImageControlComponent;
           }
           return ReactPresets.classic.Control;
+        },
+        node(context) {
+          // カスタムNodeコンポーネントでdata-node-type属性を追加
+          const Component = ReactPresets.classic.Node;
+          return (props: any) => {
+            const nodeType = props.data.label || 'Unknown';
+            return (
+              <div data-node-type={nodeType}>
+                <Component {...props} />
+              </div>
+            );
+          };
         }
       }
     }));
@@ -120,6 +132,29 @@ export function useEditor(props: EditorProps) {
     backgroundHolder.insertBefore(gridContainer, backgroundHolder.firstChild);
     gridRoot = createRoot(gridContainer);
     gridRoot.render(<GridBackground size={snapSize} />);
+    
+    // SVG arrow marker を追加
+    const svgElement = area.area.content.holder.querySelector('svg');
+    if (svgElement) {
+      const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+      const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+      marker.setAttribute('id', 'arrowhead');
+      marker.setAttribute('markerWidth', '10');
+      marker.setAttribute('markerHeight', '10');
+      marker.setAttribute('refX', '9');
+      marker.setAttribute('refY', '3');
+      marker.setAttribute('orient', 'auto');
+      marker.setAttribute('markerUnits', 'strokeWidth');
+      
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', 'M0,0 L0,6 L9,3 z');
+      path.setAttribute('fill', '#94a3b8');
+      
+      marker.appendChild(path);
+      defs.appendChild(marker);
+      svgElement.insertBefore(defs, svgElement.firstChild);
+    }
+    
     disposer = area.addPipe(context => {
         if (context.type === 'nodetranslated') {
             const id = context.data.id;

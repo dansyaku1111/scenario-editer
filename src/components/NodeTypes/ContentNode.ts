@@ -8,7 +8,7 @@ export class ContentNode extends ClassicPreset.Node<
 > {
   width = 220;
   height = 280;
-  data: { title: string; text: string; imageUrl: string } = {
+  data: { title: string; text: string; imageUrl: string; url?: string } = {
     title: 'Node Title',
     text: 'This is the default text content for the node.',
     imageUrl: 'https://placehold.co/200x150'
@@ -22,5 +22,22 @@ export class ContentNode extends ClassicPreset.Node<
     if (initialData) {
       this.data = { ...this.data, ...initialData };
     }
+    
+    // 画像Controlを追加（url と imageUrl の両方をチェック）
+    const imageUrl = (this.data as any).url || this.data.imageUrl;
+    this.addControl('image', new ImageControl(imageUrl, this.data.text));
+  }
+  
+  // データ更新時にControlも更新
+  updateData(newData: Partial<ContentNode['data']>) {
+    this.data = { ...this.data, ...newData };
+    
+    // Controlを削除して再作成
+    if (this.controls.image) {
+      this.removeControl('image');
+    }
+    
+    const imageUrl = (this.data as any).url || this.data.imageUrl;
+    this.addControl('image', new ImageControl(imageUrl, this.data.text));
   }
 }
