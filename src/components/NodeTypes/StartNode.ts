@@ -9,9 +9,10 @@ export class StartNode extends ClassicPreset.Node<
 > {
     width = 180;
     height = 180;
-    data: { title?: string; imageUrl?: string; url?: string } = { 
+    data: { title?: string; imageUrl?: string; url?: string; text?: string; labelName?: string } = { 
         title: 'Start',
-        imageUrl: 'https://placehold.co/150x100/4ade80/ffffff?text=Start'
+        imageUrl: 'https://placehold.co/150x100/4ade80/ffffff?text=Start',
+        labelName: 'Start'
     };
     
     constructor(initialData?: Partial<StartNode['data']>) {

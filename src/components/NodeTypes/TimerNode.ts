@@ -18,6 +18,7 @@ export class TimerNode extends ClassicPreset.Node<
     scheduledTime?: string;
     repeat?: boolean;
     repeatInterval?: number;
+    labelName?: string;
   } = {
     title: 'Timer',
     text: 'Timer configuration',
@@ -26,7 +27,8 @@ export class TimerNode extends ClassicPreset.Node<
     delaySeconds: 5,
     scheduledTime: '',
     repeat: false,
-    repeatInterval: 0
+    repeatInterval: 0,
+    labelName: 'Timer'
   };
 
   constructor(initialData?: Partial<TimerNode['data']>) {

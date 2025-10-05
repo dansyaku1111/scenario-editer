@@ -18,6 +18,7 @@ export class ExternalResourceNode extends ClassicPreset.Node<
     method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
     headers?: Record<string, string>;
     body?: any;
+    labelName?: string;
   } = {
     title: 'External Resource',
     text: 'External resource configuration',
@@ -26,7 +27,8 @@ export class ExternalResourceNode extends ClassicPreset.Node<
     resourceUrl: '',
     method: 'GET',
     headers: {},
-    body: null
+    body: null,
+    labelName: 'External Resource'
   };
 
   constructor(initialData?: Partial<ExternalResourceNode['data']>) {

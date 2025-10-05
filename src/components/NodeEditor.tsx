@@ -6,6 +6,7 @@ import { ReactPlugin, Presets as ReactPresets, ReactArea2D } from 'rete-react-pl
 import { createRoot, Root } from 'react-dom/client';
 import GridBackground from './GridBackground';
 import { ImageControlComponent } from './NodeTypes/ImageControl';
+import { CustomNodeComponent } from './NodeTypes/CustomNode';
 
 type Area = ReactArea2D<any>;
 
@@ -38,8 +39,7 @@ export function useEditor(props: EditorProps) {
     
     connection.addPreset(ConnectionPresets.classic.setup());
 
-    // デフォルトのノードレンダリングを使用（ソケットの接続機能を保持）
-    // カスタムControlコンポーネントを登録
+    // カスタムNodeコンポーネントとControlコンポーネントを登録
     render.addPreset(ReactPresets.classic.setup({
       customize: {
         control(context) {
@@ -48,17 +48,9 @@ export function useEditor(props: EditorProps) {
           }
           return ReactPresets.classic.Control;
         },
-        node(context) {
-          // カスタムNodeコンポーネントでdata-node-type属性を追加
-          const Component = ReactPresets.classic.Node;
-          return (props: any) => {
-            const nodeType = props.data.label || 'Unknown';
-            return (
-              <div data-node-type={nodeType}>
-                <Component {...props} />
-              </div>
-            );
-          };
+        node() {
+          // 完全カスタムのNodeコンポーネントを使用
+          return CustomNodeComponent;
         }
       }
     }));

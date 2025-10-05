@@ -9,9 +9,10 @@ export class EndNode extends ClassicPreset.Node<
 > {
     width = 180;
     height = 180;
-    data: { title?: string; imageUrl?: string; url?: string } = { 
+    data: { title?: string; imageUrl?: string; url?: string; text?: string; labelName?: string } = { 
         title: 'End',
-        imageUrl: 'https://placehold.co/150x100/ef4444/ffffff?text=End'
+        imageUrl: 'https://placehold.co/150x100/ef4444/ffffff?text=End',
+        labelName: 'End'
     };
     
     constructor(initialData?: Partial<EndNode['data']>) {

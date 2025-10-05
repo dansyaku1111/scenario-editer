@@ -18,6 +18,7 @@ export class EventNode extends ClassicPreset.Node<
     duration?: number;
     location?: string;
     participants?: string[];
+    labelName?: string;
   } = {
     title: 'Event',
     text: 'Event description',
@@ -26,7 +27,8 @@ export class EventNode extends ClassicPreset.Node<
     timestamp: new Date().toISOString(),
     duration: 0,
     location: '',
-    participants: []
+    participants: [],
+    labelName: 'Event'
   };
 
   constructor(initialData?: Partial<EventNode['data']>) {

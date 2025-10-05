@@ -1,0 +1,356 @@
+/* ========================================
+   カスタムノードのスタイル
+   ソケットを境界線上に配置する新しいレイアウト
+   ======================================== */
+
+/* 全体コンテナ */
+.custom-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  user-select: none;
+  cursor: move;
+}
+
+/* ノードのカスタムラベル名（上部） */
+.node-label-name {
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 4px;
+  text-align: center;
+  color: #1f2937;
+  padding: 0 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+/* メインコンテナ（境界線付きボックス） */
+.node-main-container {
+  position: relative;
+  border: 2px solid #3b82f6;
+  border-radius: 12px;
+  padding: 12px;
+  background: white;
+  min-width: 200px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.custom-node:hover .node-main-container {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+/* 選択状態 */
+.custom-node.selected .node-main-container,
+[data-testid='node'].selected .node-main-container {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.3), 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+/* ========================================
+   ソケットの配置（境界線上）
+   ======================================== */
+
+/* 入力ソケット群（左境界線上） */
+.input-sockets {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 出力ソケット群（右境界線上） */
+.output-sockets {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translate(50%, -50%);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ソケットコンテナ */
+.socket-container {
+  width: 16px;
+  height: 16px;
+  position: relative;
+  cursor: crosshair;
+  /* Rete.jsが接続点を正しく計算できるように調整 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ソケットの外観 */
+.socket-indicator {
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+  border: 3px solid #3b82f6;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.socket-indicator:hover {
+  background: #3b82f6;
+  border-color: #2563eb;
+  transform: scale(1.2);
+  box-shadow: 0 3px 6px rgba(59, 130, 246, 0.4);
+}
+
+/* 旧ソケット（Rete.jsデフォルト）を非表示にする */
+.socket-container > :not(.socket-indicator) {
+  display: none !important;
+}
+
+/* Rete.jsが自動生成するソケット要素を完全に非表示 */
+.custom-node [data-testid="socket"] > div:not(.socket-indicator) {
+  display: none !important;
+}
+
+/* ========================================
+   コンテンツエリア
+   ======================================== */
+
+.node-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
+/* Control要素 */
+.node-content .control {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* 画像コントロール */
+.node-content .image-control {
+  width: 160px !important;
+  max-width: 160px !important;
+  padding: 0 !important;
+  margin: 0 auto;
+}
+
+.node-content .image-control img {
+  width: 160px !important;
+  max-width: 160px !important;
+  height: auto !important;
+  max-height: 120px !important;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+/* 説明文 */
+.node-content .image-control p {
+  margin-top: 8px;
+  margin-bottom: 0;
+  font-size: 12px;
+  color: #374151;
+  text-align: left;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ========================================
+   ノードタイプラベル（下部）
+   ======================================== */
+
+.node-type-label {
+  margin-top: 4px;
+  font-size: 11px;
+  color: #6b7280;
+  text-align: center;
+  font-weight: 500;
+  padding: 0 8px;
+}
+
+/* ========================================
+   ノードタイプ別のスタイル
+   ======================================== */
+
+/* Start Node - Green */
+[data-node-type='Start'] .node-main-container {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  border-color: #22c55e;
+  border-width: 2.5px;
+}
+
+[data-node-type='Start'] .socket-indicator {
+  border-color: #22c55e;
+}
+
+[data-node-type='Start'] .socket-indicator:hover {
+  background: #22c55e;
+  border-color: #16a34a;
+}
+
+/* Action Node - Blue */
+[data-node-type='Action'] .node-main-container {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-color: #3b82f6;
+}
+
+/* Character Node - Purple */
+[data-node-type='Character'] .node-main-container {
+  background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+  border-color: #8b5cf6;
+}
+
+[data-node-type='Character'] .socket-indicator {
+  border-color: #8b5cf6;
+}
+
+[data-node-type='Character'] .socket-indicator:hover {
+  background: #8b5cf6;
+  border-color: #7c3aed;
+}
+
+/* Condition Node - Amber */
+[data-node-type='Condition'] .node-main-container {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-color: #f59e0b;
+}
+
+[data-node-type='Condition'] .socket-indicator {
+  border-color: #f59e0b;
+}
+
+[data-node-type='Condition'] .socket-indicator:hover {
+  background: #f59e0b;
+  border-color: #d97706;
+}
+
+/* Content Node - Cyan */
+[data-node-type='Content'] .node-main-container {
+  background: linear-gradient(135deg, #cffafe 0%, #a5f3fc 100%);
+  border-color: #06b6d4;
+}
+
+[data-node-type='Content'] .socket-indicator {
+  border-color: #06b6d4;
+}
+
+[data-node-type='Content'] .socket-indicator:hover {
+  background: #06b6d4;
+  border-color: #0891b2;
+}
+
+/* Event Node - Pink */
+[data-node-type='Event'] .node-main-container {
+  background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+  border-color: #ec4899;
+}
+
+[data-node-type='Event'] .socket-indicator {
+  border-color: #ec4899;
+}
+
+[data-node-type='Event'] .socket-indicator:hover {
+  background: #ec4899;
+  border-color: #db2777;
+}
+
+/* Timer Node - Orange */
+[data-node-type='Timer'] .node-main-container {
+  background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
+  border-color: #f97316;
+}
+
+[data-node-type='Timer'] .socket-indicator {
+  border-color: #f97316;
+}
+
+[data-node-type='Timer'] .socket-indicator:hover {
+  background: #f97316;
+  border-color: #ea580c;
+}
+
+/* Image Node - Indigo */
+[data-node-type='Image'] .node-main-container {
+  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+  border-color: #6366f1;
+}
+
+[data-node-type='Image'] .socket-indicator {
+  border-color: #6366f1;
+}
+
+[data-node-type='Image'] .socket-indicator:hover {
+  background: #6366f1;
+  border-color: #4f46e5;
+}
+
+/* External Resource Node - Teal */
+[data-node-type='External Resource'] .node-main-container {
+  background: linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%);
+  border-color: #14b8a6;
+}
+
+[data-node-type='External Resource'] .socket-indicator {
+  border-color: #14b8a6;
+}
+
+[data-node-type='External Resource'] .socket-indicator:hover {
+  background: #14b8a6;
+  border-color: #0d9488;
+}
+
+/* End Node - Red */
+[data-node-type='End'] .node-main-container {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  border-color: #ef4444;
+  border-width: 2.5px;
+}
+
+[data-node-type='End'] .socket-indicator {
+  border-color: #ef4444;
+}
+
+[data-node-type='End'] .socket-indicator:hover {
+  background: #ef4444;
+  border-color: #dc2626;
+}
+
+/* ========================================
+   レスポンシブ対応
+   ======================================== */
+
+@media (max-width: 768px) {
+  .node-content .image-control {
+    width: 120px !important;
+    max-width: 120px !important;
+  }
+
+  .node-content .image-control img {
+    width: 120px !important;
+    max-width: 120px !important;
+    max-height: 90px !important;
+  }
+}
+
+/* タッチデバイス用 */
+@media (hover: none) {
+  .socket-container {
+    width: 20px;
+    height: 20px;
+  }
+}

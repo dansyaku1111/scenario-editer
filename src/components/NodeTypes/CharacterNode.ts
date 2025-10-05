@@ -17,6 +17,8 @@ export class CharacterNode extends ClassicPreset.Node<
     role?: string;
     attributes?: Record<string, any>;
     relationships?: Array<{ targetId: string; type: string; description?: string }>;
+    url?: string;
+    labelName?: string;
   } = {
     title: 'Character',
     text: 'Character description',
@@ -24,7 +26,8 @@ export class CharacterNode extends ClassicPreset.Node<
     characterName: 'New Character',
     role: 'Protagonist',
     attributes: {},
-    relationships: []
+    relationships: [],
+    labelName: 'Character'
   };
 
   constructor(initialData?: Partial<CharacterNode['data']>) {

@@ -8,10 +8,11 @@ export class ContentNode extends ClassicPreset.Node<
 > {
   width = 220;
   height = 280;
-  data: { title: string; text: string; imageUrl: string; url?: string } = {
+  data: { title: string; text: string; imageUrl: string; url?: string; labelName?: string } = {
     title: 'Node Title',
     text: 'This is the default text content for the node.',
-    imageUrl: 'https://placehold.co/200x150'
+    imageUrl: 'https://placehold.co/200x150',
+    labelName: 'Content'
   };
 
   constructor(initialData?: Partial<ContentNode['data']>) {

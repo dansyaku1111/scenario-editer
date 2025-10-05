@@ -8,11 +8,12 @@ export class ConditionNode extends ClassicPreset.Node<
 > {
   width = 220;
   height = 280;
-  data: { title: string; text: string; imageUrl: string; url?: string; conditionExpression?: string } = {
+  data: { title: string; text: string; imageUrl: string; url?: string; conditionExpression?: string; labelName?: string } = {
     title: 'Condition Node',
     text: 'This is the default condition text.',
     imageUrl: 'https://placehold.co/200x150',
-    conditionExpression: ''
+    conditionExpression: '',
+    labelName: 'Condition'
   };
 
   constructor(initialData?: Partial<ConditionNode['data']>) {

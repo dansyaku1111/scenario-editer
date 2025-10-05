@@ -19,6 +19,10 @@ export default function EditorPanel({ node, onUpdate }: Props) {
         onUpdate(node.id, { text: e.target.value });
     };
 
+    const handleLabelNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        onUpdate(node.id, { labelName: e.target.value });
+    };
+
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
@@ -33,6 +37,22 @@ export default function EditorPanel({ node, onUpdate }: Props) {
     };
 
     const renderEditor = () => {
+        // ラベル名エディター（全ノード共通）
+        const labelEditor = (
+            <div>
+                <label htmlFor="node-label-name" className="block text-sm font-medium text-gray-700">ラベル名</label>
+                <input
+                    type="text"
+                    id="node-label-name"
+                    value={(node.data as any)?.labelName || node.label || ''}
+                    onChange={handleLabelNameChange}
+                    placeholder={`デフォルト: ${node.label}`}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                />
+                <p className="mt-1 text-xs text-gray-500">ノードの上部に表示される名前です</p>
+            </div>
+        );
+
         const imageEditor = (
             <div>
                 <label htmlFor="node-image-upload" className="block text-sm font-medium text-gray-700">画像ファイル</label>
@@ -50,11 +70,21 @@ export default function EditorPanel({ node, onUpdate }: Props) {
         switch (node.label) {
             case 'Start':
             case 'End':
-                // Start/Endノードは画像のみ編集可能
-                return imageEditor;
+                // Start/Endノードはラベル名と画像を編集可能
+                return (
+                    <div className="space-y-4">
+                        {labelEditor}
+                        {imageEditor}
+                    </div>
+                );
             case 'Image':
-                // Imageノードも画像のみ編集可能
-                return imageEditor;
+                // Imageノードもラベル名と画像を編集可能
+                return (
+                    <div className="space-y-4">
+                        {labelEditor}
+                        {imageEditor}
+                    </div>
+                );
             case 'Action':
             case 'Condition':
             case 'Content':
@@ -62,9 +92,10 @@ export default function EditorPanel({ node, onUpdate }: Props) {
             case 'Event':
             case 'Timer':
             case 'External Resource':
-                // テキストと画像の両方を編集可能
+                // ラベル名、テキスト、画像の全てを編集可能
                 return (
                     <div className="space-y-4">
+                        {labelEditor}
                         <div>
                             <label htmlFor="node-text" className="block text-sm font-medium text-gray-700">内容</label>
                             <textarea
@@ -79,7 +110,12 @@ export default function EditorPanel({ node, onUpdate }: Props) {
                     </div>
                 );
             default:
-                return <p className="text-gray-500">このノードには編集可能な項目がありません。</p>;
+                return (
+                    <div className="space-y-4">
+                        {labelEditor}
+                        <p className="text-gray-500">このノードには他に編集可能な項目がありません。</p>
+                    </div>
+                );
         }
     };
 

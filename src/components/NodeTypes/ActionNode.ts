@@ -9,10 +9,11 @@ export class ActionNode extends ClassicPreset.Node<
 > {
   width = 220;
   height = 280;
-  data: { title: string; text: string; imageUrl: string; url?: string } = {
+  data: { title: string; text: string; imageUrl: string; url?: string; labelName?: string } = {
     title: 'Action Node',
     text: 'This is the default action text.',
-    imageUrl: 'https://placehold.co/200x150'
+    imageUrl: 'https://placehold.co/200x150',
+    labelName: 'Action'
   };
 
   constructor(initialData?: Partial<ActionNode['data']>) {
