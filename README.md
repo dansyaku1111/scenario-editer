@@ -37,8 +37,27 @@ npm run build
 
 ## 📚 ドキュメント
 
-- **[NODES_SOCKETS_EDGES.md](./NODES_SOCKETS_EDGES.md)** - ノード・ソケット・エッジシステムの詳細仕様
-- **[IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md)** - 実装の概要と変更履歴
+### ユーザーガイド
+- **[スタートガイド](./docs/guides/STARTUP_GUIDE.md)** - 初めて使う方へ
+- **[JSONガイド（簡易版）](./docs/guides/MANUAL_JSON_GUIDE.md)** - 手動でJSONを作成する方法
+- **[データ生成ガイド](./docs/guides/DATA_GENERATION_GUIDE.md)** - テストデータの生成方法
+- **[ノードスタイルガイド](./docs/guides/NODE_STYLE_GUIDE.md)** - ノードのデザイン・色の仕様
+- **[ビジュアルガイド](./docs/guides/VISUAL_GUIDE.md)** - UIの使い方
+
+### 技術仕様書
+- **[JSON完全仕様](./docs/specifications/JSON_SPECIFICATION_GUIDE.md)** - JSONフォーマットの完全なリファレンス
+- **[ノード・ソケット・エッジ仕様](./docs/specifications/NODES_SOCKETS_EDGES.md)** - システムの詳細仕様
+- **[インポート仕様](./docs/specifications/IMPORT_DATA_SPECIFICATION.md)** - データインポートの仕様
+- **[カスタマイズガイド](./docs/specifications/StyleCustmizeGuide.md)** - Rete.js v2カスタマイズ方法
+
+### 開発者向け
+- **[実装サマリ](./docs/development/IMPLEMENTATION_SUMMARY.md)** - 実装の概要
+- **[ノードレイアウト設計](./docs/development/NODE_LAYOUT_REDESIGN_APPROACH.md)** - カスタムレイアウトの設計
+- **[技術詳細](./docs/development/NODE_LAYOUT_TECHNICAL_DETAILS.md)** - 実装の技術的詳細
+- **[ドキュメント索引](./docs/development/DOCUMENTATION_INDEX.md)** - 全ドキュメントの索引
+
+### 修正履歴
+- [修正ドキュメント一覧](./docs/fixes/) - 各種バグ修正の記録
 
 ## 🎨 ノードタイプ
 
@@ -136,7 +155,7 @@ scenario-editer/
 │   ├── components/
 │   │   ├── NodeTypes/          # ノード定義
 │   │   │   ├── *Node.ts        # ノードクラス
-│   │   │   ├── *NodeComponent.tsx  # Reactコンポーネント
+│   │   │   ├── CustomNode.tsx  # カスタムレイアウト
 │   │   │   └── sockets.ts      # ソケット定義
 │   │   ├── NodeEditor.tsx      # メインエディタ
 │   │   ├── Toolbar.tsx         # ツールバー
@@ -144,11 +163,16 @@ scenario-editer/
 │   ├── utils/
 │   │   ├── jsonSchema.ts       # 型定義
 │   │   ├── jsonHandler.ts      # JSON入出力
-│   │   ├── validation.ts       # バリデーション
-│   │   └── edges.ts            # エッジシステム
+│   │   └── validation.ts       # バリデーション
 │   └── App.tsx                 # メインアプリ
-├── NODES_SOCKETS_EDGES.md      # 詳細仕様
-├── IMPLEMENTATION_SUMMARY.md   # 実装サマリ
+├── docs/
+│   ├── guides/                 # ユーザーガイド
+│   ├── specifications/         # 技術仕様書
+│   ├── development/            # 開発者向けドキュメント
+│   ├── fixes/                  # 修正履歴
+│   └── archive/                # アーカイブ
+├── README.md                   # このファイル
+├── CHANGELOG.md                # 変更履歴
 └── package.json
 ```
 
@@ -161,7 +185,7 @@ scenario-editer/
 3. Reactコンポーネントを作成
 4. `NodeEditor.tsx`、`Toolbar.tsx`、`jsonHandler.ts` を更新
 
-詳細は [NODES_SOCKETS_EDGES.md](./NODES_SOCKETS_EDGES.md) を参照してください。
+詳細は [ノード・ソケット・エッジ仕様](./docs/specifications/NODES_SOCKETS_EDGES.md) を参照してください。
 
 ## 🐛 トラブルシューティング
 
@@ -189,5 +213,15 @@ Issue や Pull Request を歓迎します。
 
 ---
 
-**Version**: 2.0.0  
-**Last Updated**: 2024-01
+**Version**: 2.1.0  
+**Last Updated**: 2025-10-05
+
+## 🎉 v2.1.0 の新機能
+
+- ✨ カスタムノードレイアウト（ソケットが境界線上に配置）
+- ✨ ノードラベル名のカスタマイズ機能
+- ✨ 画像サイズ固定（160px）による統一感
+- ✨ Draw.io風のモダンなデザイン
+- ✨ 改善されたユーザーインターフェース
+
+詳細は [CHANGELOG.md](./CHANGELOG.md) を参照してください。
