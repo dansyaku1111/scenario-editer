@@ -24,7 +24,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 220px;
+  max-width: 330px; /* 220px × 1.5 = 330px */
 }
 
 /* メインコンテナ（境界線付きボックス） */
@@ -34,7 +34,7 @@
   border-radius: 12px;
   padding: 12px;
   background: white;
-  min-width: 200px;
+  min-width: 300px; /* 200px × 1.5 = 300px */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease;
 }
@@ -60,7 +60,8 @@
   position: absolute;
   left: 0;
   top: 50%;
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
+  margin-top: -8px; /* ソケットの半分の高さ（16px / 2）を引いて中央揃え */
   z-index: 10;
   display: flex;
   flex-direction: column;
@@ -72,7 +73,8 @@
   position: absolute;
   right: 0;
   top: 50%;
-  transform: translate(50%, -50%);
+  transform: translateX(50%);
+  margin-top: -8px; /* ソケットの半分の高さ（16px / 2）を引いて中央揃え */
   z-index: 10;
   display: flex;
   flex-direction: column;
@@ -143,17 +145,17 @@
 
 /* 画像コントロール */
 .node-content .image-control {
-  width: 160px !important;
-  max-width: 160px !important;
+  width: 240px !important; /* 160px × 1.5 = 240px */
+  max-width: 240px !important;
   padding: 0 !important;
   margin: 0 auto;
 }
 
 .node-content .image-control img {
-  width: 160px !important;
-  max-width: 160px !important;
+  width: 240px !important; /* 160px × 1.5 = 240px */
+  max-width: 240px !important;
   height: auto !important;
-  max-height: 120px !important;
+  max-height: 180px !important; /* 120px × 1.5 = 180px */
   object-fit: contain;
   border-radius: 4px;
 }
@@ -168,6 +170,7 @@
   line-height: 1.4;
   white-space: pre-wrap;
   word-break: break-word;
+  max-width: 240px; /* 画像と同じ幅に制限 */
 }
 
 /* ========================================
@@ -336,14 +339,14 @@
 
 @media (max-width: 768px) {
   .node-content .image-control {
-    width: 120px !important;
-    max-width: 120px !important;
+    width: 180px !important; /* 120px × 1.5 = 180px */
+    max-width: 180px !important;
   }
 
   .node-content .image-control img {
-    width: 120px !important;
-    max-width: 120px !important;
-    max-height: 90px !important;
+    width: 180px !important; /* 120px × 1.5 = 180px */
+    max-width: 180px !important;
+    max-height: 135px !important; /* 90px × 1.5 = 135px */
   }
 }
 
