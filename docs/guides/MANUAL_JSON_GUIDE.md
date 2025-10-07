@@ -63,12 +63,12 @@
   "y": 100,
   "data": {
     "title": "Start",
-    "name": "シナリオ開始"
+    "labelName": "シナリオ開始"
   }
 }
 ```
 
-**新機能:** `name` フィールドでノードにラベル名を付けられます。ラベル名はノードの上部に表示されます。
+**新機能:** `labellabelName` フィールドでノードにラベル名を付けられます。ラベル名はノードの上部に表示されます。
 
 #### 2. Action Node（アクションノード）
 
@@ -81,14 +81,14 @@
   "y": 100,
   "data": {
     "title": "アクションのタイトル",
-    "name": "重要な行動",
+    "labelName": "重要な行動",
     "text": "ここにアクションの説明を記述します。",
     "imageUrl": "https://placehold.co/200x150"
   }
 }
 ```
 
-**`name` フィールド:** ノード上部に表示されるラベル名（省略可能）
+**`labelName` フィールド:** ノード上部に表示されるラベル名（省略可能）
 
 #### 3. Condition Node（条件分岐ノード）
 
@@ -101,7 +101,7 @@
   "y": 100,
   "data": {
     "title": "条件チェック",
-    "name": "分岐点A",
+    "labelName": "分岐点A",
     "text": "条件の説明",
     "conditionExpression": "value > 10"
   }
@@ -123,7 +123,7 @@
   "y": 300,
   "data": {
     "title": "Character",
-    "name": "主人公",
+    "labelName": "主人公",
     "characterName": "キャラクター名",
     "role": "Protagonist",
     "text": "キャラクターの説明",
@@ -153,7 +153,7 @@
   "y": 400,
   "data": {
     "title": "Event",
-    "name": "重要イベント",
+    "labelName": "重要イベント",
     "eventName": "イベント名",
     "text": "イベントの説明",
     "imageUrl": "https://placehold.co/200x150",
@@ -179,7 +179,7 @@
   "y": 100,
   "data": {
     "title": "End",
-    "name": "エンディング"
+    "labelName": "エンディング"
   }
 }
 ```
@@ -219,7 +219,7 @@
 
 ## 完全な例：シンプルなストーリー
 
-以下は、完全に動作するシナリオの例です。**v2.1.0の新機能である`name`フィールドを使用しています。**
+以下は、完全に動作するシナリオの例です。**v2.1.1の新機能である`labelName`フィールドを使用しています。**
 
 ```json
 {
@@ -232,7 +232,7 @@
       "y": 200,
       "data": {
         "title": "物語の始まり",
-        "name": "プロローグ"
+        "labelName": "プロローグ"
       }
     },
     {
@@ -243,7 +243,7 @@
       "y": 400,
       "data": {
         "title": "Character",
-        "name": "主人公",
+        "labelName": "主人公",
         "characterName": "勇者アレックス",
         "role": "Protagonist",
         "text": "正義感の強い若き勇者",
@@ -264,7 +264,7 @@
       "y": 200,
       "data": {
         "title": "旅立ち",
-        "name": "冒険の始まり",
+        "labelName": "冒険の始まり",
         "text": "勇者は魔王を倒すために旅立った。",
         "imageUrl": "https://placehold.co/200x150"
       }
@@ -277,7 +277,7 @@
       "y": 400,
       "data": {
         "title": "Event",
-        "name": "村イベント",
+        "labelName": "村イベント",
         "eventName": "村での出会い",
         "text": "道中の村で仲間と出会う",
         "imageUrl": "https://placehold.co/200x150",
@@ -295,7 +295,7 @@
       "y": 200,
       "data": {
         "title": "森の探索",
-        "name": "暗黒の森",
+        "labelName": "暗黒の森",
         "text": "魔王の城へ続く暗黒の森を抜ける。",
         "imageUrl": "https://placehold.co/200x150"
       }
@@ -308,7 +308,7 @@
       "y": 200,
       "data": {
         "title": "モンスター遭遇",
-        "name": "戦闘判定",
+        "labelName": "戦闘判定",
         "text": "モンスターに遭遇した！戦いますか？",
         "conditionExpression": "fight_choice == true"
       }
@@ -321,7 +321,7 @@
       "y": 100,
       "data": {
         "title": "戦闘",
-        "name": "勝利への道",
+        "labelName": "勝利への道",
         "text": "勇者はモンスターと戦った！",
         "imageUrl": "https://placehold.co/200x150"
       }
@@ -334,7 +334,7 @@
       "y": 300,
       "data": {
         "title": "逃走",
-        "name": "撤退",
+        "labelName": "撤退",
         "text": "勇者は逃げ出した。",
         "imageUrl": "https://placehold.co/200x150"
       }
@@ -347,7 +347,7 @@
       "y": 100,
       "data": {
         "title": "勝利",
-        "name": "ハッピーエンド"
+        "labelName": "ハッピーエンド"
       }
     },
     {
@@ -358,7 +358,7 @@
       "y": 300,
       "data": {
         "title": "撤退",
-        "name": "バッドエンド"
+        "labelName": "バッドエンド"
       }
     }
   ],
